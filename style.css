@@ -1,0 +1,420 @@
+:root {
+  --bg-color: #12161a;
+  --card-bg: #1a1f26;
+  --accent-color: #d4a373;
+  --accent-glow: rgba(212, 163, 115, 0.4);
+  --text-color: #f4f1de;
+  --text-muted: #a0aab2;
+  --ding-color: #e9c46a;
+  --note-color: #264653;
+  --note-hover: #2a9d8f;
+  --active-note: #e76f51;
+  --success-color: #2a9d8f;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+}
+
+h1 {
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--accent-color);
+  font-size: 2.2rem;
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+.scale-selector-container {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+select {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--accent-color);
+  padding: 8px 15px;
+  border-radius: 20px;
+  outline: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Onglets */
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  background-color: var(--card-bg);
+  border-radius: 30px;
+  padding: 5px;
+  margin-bottom: 25px;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.tab-btn.active {
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+}
+
+/* Contenu des onglets */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Le Handpan */
+.handpan-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.handpan {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, #2c3540 0%, #151a21 70%, #0b0d10 100%);
+  border-radius: 50%;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 2px 10px rgba(255,255,255,0.1);
+  border: 6px solid #222a35;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  touch-action: none;
+}
+
+.note {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: inset 0 4px 6px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.note:active, .note.active {
+  transform: scale(0.95);
+  box-shadow: 0 0 20px var(--active-note), inset 0 2px 4px rgba(0,0,0,0.6);
+  background-color: var(--active-note) !important;
+}
+
+.note.highlight {
+  animation: pulseGlow 1s infinite alternate;
+  border: 2px solid #fff;
+}
+
+@keyframes pulseGlow {
+  from { box-shadow: 0 0 10px var(--accent-color); }
+  to { box-shadow: 0 0 25px var(--accent-color); }
+}
+
+.note-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.note-num {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+/* Ding (Centre) */
+.ding {
+  width: 85px;
+  height: 85px;
+  background-color: var(--ding-color);
+  color: #12161a;
+  z-index: 10;
+}
+
+/* Notes périphériques */
+.outer-notes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.outer-note {
+  width: 65px;
+  height: 65px;
+  background-color: var(--note-color);
+  color: var(--text-color);
+  pointer-events: auto;
+}
+
+.instructions {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 20px;
+  line-height: 1.4;
+}
+
+/* Cours & Exercices */
+.lessons-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.lesson-card {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 15px;
+  border-left: 4px solid var(--accent-color);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lesson-card h3 {
+  font-size: 1.1rem;
+  color: var(--accent-color);
+}
+
+.lesson-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.sequence {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+}
+
+.seq-badge {
+  background-color: #2c3540;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.btn {
+  background-color: var(--accent-color);
+  color: var(--bg-color);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-family: inherit;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: #e9c46a;
+}
+
+.btn-danger {
+  background-color: #e76f51;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #f4a261;
+}
+
+.interactive-practice {
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 20px;
+  text-align: center;
+  border: 2px solid var(--accent-color);
+}
+
+.practice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.practice-steps {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.step-indicator {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: #2c3540;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  border: 2px solid transparent;
+}
+
+.step-indicator.active {
+  border-color: var(--accent-color);
+  background-color: rgba(212, 163, 115, 0.2);
+}
+
+.step-indicator.success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.practice-feedback {
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+/* Métronome */
+.metronome-card {
+  background-color: var(--card-bg);
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.tempo-display {
+  font-size: 3rem;
+  font-weight: 300;
+  color: var(--accent-color);
+  margin-bottom: 10px;
+}
+
+.bpm-unit {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.slider-container {
+  margin: 20px 0 30px 0;
+}
+
+#tempo-slider {
+  width: 100%;
+  accent-color: var(--accent-color);
+}
+
+.visual-beat-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.beat-indicator {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: #2c3540;
+  transition: background-color 0.1s ease;
+}
+
+.beat-indicator.active {
+  background-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--accent-color);
+}
+
+.hidden {
+  display: none !important;
+}
+
+footer {
+  text-align: center;
+  margin-top: auto;
+  padding: 20px 0 10px 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Responsive */
+@media (min-width: 480px) {
+  .handpan {
+    width: 400px;
+    height: 400px;
+  }
+  .ding {
+    width: 100px;
+    height: 100px;
+  }
+  .outer-note {
+    width: 80px;
+    height: 80px;
+  }
+  .lessons-grid {
+    grid-template-columns: 1fr;
+  }
+}

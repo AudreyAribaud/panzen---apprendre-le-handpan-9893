@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PanZen - Apprendre le Handpan</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a1e24">
+  <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=128&h=128&q=80">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <div class="logo-area">
+        <h1>PanZen</h1>
+        <p class="subtitle">L'art du Handpan à portée de main</p>
+      </div>
+      <div class="scale-selector-container">
+        <label for="scale-select">Gamme :</label>
+        <select id="scale-select">
+          <option value="celtic">Ré Celtique Mineur (D Celtic)</option>
+          <option value="kurd">Ré Kurd (D Kurd)</option>
+          <option value="hijaz">Ré Hijaz (D Hijaz)</option>
+          <option value="pygmy">Fa Pygmée (F Pygmy)</option>
+        </select>
+      </div>
+    </header>
+
+    <main>
+      <!-- Onglets de navigation -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="play-tab">Jouer</button>
+        <button class="tab-btn" data-tab="lessons-tab">Cours & Exercices</button>
+        <button class="tab-btn" data-tab="metronome-tab">Métronome</button>
+      </div>
+
+      <!-- Section JOUER -->
+      <section id="play-tab" class="tab-content active">
+        <div class="handpan-container">
+          <div class="handpan" id="handpan-instrument">
+            <!-- Le Ding (Note centrale) -->
+            <div class="note ding" id="note-ding" data-note-index="0">
+              <span class="note-name">D3</span>
+              <span class="note-num">0</span>
+            </div>
+            <!-- Les notes périphériques seront générées dynamiquement par JS -->
+            <div class="outer-notes" id="outer-notes-container"></div>
+          </div>
+        </div>
+        <div class="instructions">
+          <p>Touchez ou cliquez sur les notes pour jouer. Utilisez votre clavier (touches 0 à 8) pour une expérience immersive !</p>
+        </div>
+      </section>
+
+      <!-- Section COURS -->
+      <section id="lessons-tab" class="tab-content">
+        <div class="lessons-grid">
+          <div class="lesson-card" data-lesson="1">
+            <h3>1. Le Frappé Fondamental</h3>
+            <p>Apprenez le rebond essentiel pour faire chanter le Ding et la note de base.</p>
+            <div class="sequence">Séquence : <span class="seq-badge">0</span> - <span class="seq-badge">1</span> - <span class="seq-badge">0</span> - <span class="seq-badge">1</span></div>
+            <button class="btn start-lesson-btn">Démarrer</button>
+          </div>
+          <div class="lesson-card" data-lesson="2">
+            <h3>2. La Valse du Voyageur</h3>
+            <p>Un rythme fluide en 3 temps alternant main gauche et main droite.</p>
+            <div class="sequence">Séquence : <span class="seq-badge">0</span> - <span class="seq-badge">2</span> - <span class="seq-badge">3</span></div>
+            <button class="btn start-lesson-btn">Démarrer</button>
+          </div>
+          <div class="lesson-card" data-lesson="3">
+            <h3>3. L'Envol Celtique</h3>
+            <p>Une mélodie envoûtante utilisant toute la largeur de la gamme.</p>
+            <div class="sequence">Séquence : <span class="seq-badge">1</span> - <span class="seq-badge">3</span> - <span class="seq-badge">5</span> - <span class="seq-badge">4</span> - <span class="seq-badge">2</span></div>
+            <button class="btn start-lesson-btn">Démarrer</button>
+          </div>
+        </div>
+
+        <!-- Zone d'entraînement interactive -->
+        <div class="interactive-practice hidden" id="practice-zone">
+          <div class="practice-header">
+            <h3 id="practice-title">Exercice en cours</h3>
+            <button class="btn btn-danger" id="stop-practice-btn">Quitter</button>
+          </div>
+          <div class="practice-steps" id="practice-steps-container"></div>
+          <p class="practice-feedback" id="practice-feedback">Suivez les notes illuminées !</p>
+        </div>
+      </section>
+
+      <!-- Section MÉTRONOME -->
+      <section id="metronome-tab" class="tab-content">
+        <div class="metronome-card">
+          <div class="tempo-display">
+            <span id="bpm-value">100</span> <span class="bpm-unit">BPM</span>
+          </div>
+          <div class="slider-container">
+            <input type="range" id="tempo-slider" min="40" max="218" value="100">
+          </div>
+          <div class="metronome-controls">
+            <button class="btn" id="metronome-toggle">Démarrer</button>
+          </div>
+          <div class="visual-beat-container">
+            <div class="beat-indicator" id="beat-1"></div>
+            <div class="beat-indicator" id="beat-2"></div>
+            <div class="beat-indicator" id="beat-3"></div>
+            <div class="beat-indicator" id="beat-4"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2023 PanZen - Conçu pour les amoureux du Handpan. Fonctionne hors-ligne.</p>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
