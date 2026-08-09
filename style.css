@@ -1,665 +1,378 @@
-:root {
-  --bg-color: #12161f;
-  --card-bg: #1e2530;
-  --accent-color: #8ab4f8;
-  --text-color: #e3e3e3;
-  --text-muted: #9aa0a6;
-  --border-color: #3c4043;
-  --primary-gradient: linear-gradient(135deg, #8ab4f8, #c2e7ff);
-  --shadow: 0 8px 24px rgba(0,0,0,0.3);
-  --transition: all 0.3s ease;
-}
-
+/* Reset & Base Styles */
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Quicksand', sans-serif;
-  -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  overflow-x: hidden;
+    background-color: #0f172a;
+    color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
 }
 
-/* HEADER */
 header {
-  background-color: var(--card-bg);
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border-color);
-  position: sticky;
-  top: 0;
-  z-index: 100;
+    background-color: #1e293b;
+    border-bottom: 1px solid #334155;
+    padding: 1rem 2rem;
 }
 
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .logo-icon {
-  font-size: 1.8rem;
+    font-size: 2.5rem;
 }
 
 h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0d9488;
 }
 
-nav {
-  display: flex;
-  gap: 0.5rem;
+.subtitle {
+    font-size: 0.85rem;
+    color: #94a3b8;
 }
 
-.nav-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  padding: 0.6rem 1.2rem;
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 20px;
-  transition: var(--transition);
+/* Main Layout */
+.app-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+    flex: 1;
+    width: 100%;
 }
 
-.nav-btn:hover, .nav-btn.active {
-  color: var(--bg-color);
-  background: var(--primary-gradient);
-  font-weight: 600;
+@media (max-width: 900px) {
+    .app-container {
+        grid-template-columns: 1fr;
+    }
 }
 
-/* MAIN CONTENT */
-main {
-  flex: 1;
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
+/* Cards & Sidebar */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.tab-content {
-  display: none;
+.card {
+    background-color: #1e293b;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid #334155;
 }
 
-.tab-content.active {
-  display: block;
-  animation: fadeIn 0.4s ease;
+.card h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #38bdf8;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+.card-desc {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
 }
 
-/* SEARCH & FILTER */
-.search-filter-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-#search-input {
-  width: 100%;
-  padding: 0.8rem 1.5rem;
-  border-radius: 30px;
-  border: 1px solid var(--border-color);
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  font-size: 1rem;
-  outline: none;
-  transition: var(--transition);
-}
-
-#search-input:focus {
-  border-color: var(--accent-color);
-  box-shadow: 0 0 8px rgba(138, 180, 248, 0.2);
-}
-
-.filter-buttons {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.filter-btn {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: var(--transition);
-  font-size: 0.85rem;
-}
-
-.filter-btn:hover, .filter-btn.active {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  border-color: var(--accent-color);
-  font-weight: 500;
-}
-
-/* SONGS GRID */
-.songs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.song-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 1.5rem;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
-}
-
-.song-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--primary-gradient);
-  opacity: 0;
-  transition: var(--transition);
-}
-
-.song-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow);
-  border-color: #5f6368;
-}
-
-.song-card:hover::before {
-  opacity: 1;
-}
-
-.song-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.song-title {
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.badge {
-  font-size: 0.75rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 12px;
-  font-weight: 600;
-}
-
-.badge.débutant {
-  background-color: rgba(52, 168, 83, 0.15);
-  color: #81c995;
-}
-
-.badge.intermédiaire {
-  background-color: rgba(251, 188, 4, 0.15);
-  color: #fdd663;
-}
-
-.badge.avancé {
-  background-color: rgba(234, 67, 53, 0.15);
-  color: #f28b82;
-}
-
-.song-preview {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-  font-family: monospace;
-  letter-spacing: 1px;
-  background: rgba(0,0,0,0.2);
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.song-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-/* VIRTUAL HANDPAN */
-.instrument-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2rem;
-  margin-top: 1rem;
-}
-
-.instruction {
-  text-align: center;
-  color: var(--text-muted);
-  max-width: 600px;
-  font-size: 0.95rem;
-}
-
-.handpan {
-  position: relative;
-  width: 340px;
-  height: 340px;
-  background: radial-gradient(circle, #2d3545 0%, #1a1f29 70%, #0f1218 100%);
-  border-radius: 50%;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 2px 10px rgba(255,255,255,0.1);
-  border: 8px solid #252b38;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  touch-action: none;
-}
-
-.note {
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.1s ease, background-color 0.2s;
-}
-
-.note:active, .note.active {
-  transform: scale(0.95);
-  background-color: rgba(138, 180, 248, 0.3) !important;
-  box-shadow: 0 0 20px rgba(138, 180, 248, 0.6);
-}
-
-.ding {
-  position: absolute;
-  width: 90px;
-  height: 90px;
-  background: radial-gradient(circle, #3e485c 0%, #252b38 100%);
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 3px solid #4f5b73;
-  box-shadow: inset 0 4px 6px rgba(255,255,255,0.1);
-  z-index: 2;
-}
-
-.ding .note-name {
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.ding .note-pitch {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.notes-circle {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-}
-
-.notes-circle .note {
-  position: absolute;
-  width: 65px;
-  height: 65px;
-  background: radial-gradient(circle, #343d4f 0%, #202633 100%);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border: 2px solid #434e63;
-  box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
-}
-
-/* Position the 8 notes around the circle */
-.note-1 { top: 15%; left: 50%; transform: translate(-50%, -50%); }
-.note-2 { top: 25%; left: 80%; transform: translate(-50%, -50%); }
-.note-3 { top: 50%; left: 90%; transform: translate(-50%, -50%); }
-.note-4 { top: 75%; left: 80%; transform: translate(-50%, -50%); }
-.note-5 { top: 85%; left: 50%; transform: translate(-50%, -50%); }
-.note-6 { top: 75%; left: 20%; transform: translate(-50%, -50%); }
-.note-7 { top: 50%; left: 10%; transform: translate(-50%, -50%); }
-.note-8 { top: 25%; left: 20%; transform: translate(-50%, -50%); }
-
-/* METRONOME */
-.metronome-card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 3rem 2rem;
-  max-width: 450px;
-  margin: 2rem auto;
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-
-.metronome-card h2 {
-  margin-bottom: 1.5rem;
-  font-weight: 500;
-}
-
-.tempo-display {
-  font-size: 3.5rem;
-  font-weight: 700;
-  color: var(--accent-color);
-  margin-bottom: 1rem;
-}
-
-.bpm-unit {
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: var(--text-muted);
-}
-
-#tempo-slider {
-  width: 100%;
-  margin: 1.5rem 0 2.5rem 0;
-  accent-color: var(--accent-color);
-  background: var(--border-color);
-  height: 6px;
-  border-radius: 3px;
-  outline: none;
-}
-
-.metronome-visual {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2.5rem;
-}
-
-.beat-indicator {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background-color: var(--border-color);
-  transition: background-color 0.1s ease, transform 0.1s ease;
-}
-
-.beat-indicator.active {
-  background-color: var(--accent-color);
-  transform: scale(1.3);
-  box-shadow: 0 0 12px var(--accent-color);
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
 
 .btn-primary {
-  background: var(--primary-gradient);
-  color: var(--bg-color);
-  border: none;
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  font-weight: 700;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: var(--transition);
-  box-shadow: 0 4px 12px rgba(138, 180, 248, 0.3);
+    background-color: #0d9488;
+    color: white;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(138, 180, 248, 0.5);
+    background-color: #0f766e;
 }
 
 .btn-secondary {
-  background: transparent;
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  padding: 0.8rem 2rem;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: var(--transition);
+    background-color: #475569;
+    color: white;
 }
 
 .btn-secondary:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: var(--text-muted);
+    background-color: #334155;
 }
 
-/* MODAL PLAYER */
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.8);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-  backdrop-filter: blur(8px);
-}
-
-.modal.active {
-  display: flex;
-}
-
-.modal-content {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  width: 100%;
-  max-width: 600px;
-  padding: 2.5rem;
-  position: relative;
-  box-shadow: var(--shadow);
-  animation: modalSlideUp 0.3s ease;
-}
-
-@keyframes modalSlideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.close-modal {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 2rem;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.close-modal:hover {
-  color: var(--text-color);
-}
-
-#modal-song-title {
-  margin-bottom: 0.5rem;
-  font-size: 1.6rem;
-}
-
-.song-meta {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  margin-bottom: 2rem;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-}
-
-.player-controls {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.tablature-container {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 16px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border: 1px solid var(--border-color);
-}
-
-.tablature-container h3 {
-  font-size: 1rem;
-  margin-bottom: 1rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.tab-sequence {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tab-note {
-  background-color: #2d3545;
-  border: 1px solid #434e63;
-  padding: 0.5rem 0.8rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: var(--transition);
-}
-
-.tab-note.playing {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  transform: scale(1.1);
-  box-shadow: 0 0 10px var(--accent-color);
-}
-
-/* MINI HANDPAN FOR PRACTICE */
-.interactive-practice {
-  border-top: 1px solid var(--border-color);
-  padding-top: 1.5rem;
-}
-
-.interactive-practice p {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.mini-handpan {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  background-color: rgba(0,0,0,0.15);
-  padding: 1rem;
-  border-radius: 16px;
-}
-
-.mini-ding {
-  background-color: #2d3545;
-  border: 2px solid #4f5b73;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.mini-notes {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.mini-note {
-  background-color: #202633;
-  border: 1px solid #434e63;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-  header {
+/* Scale Selector */
+.scale-options {
+    display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-  }
+    gap: 0.5rem;
+}
 
-  nav {
+.btn-scale {
+    background-color: #334155;
+    color: #cbd5e1;
+    border: 1px solid #475569;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-weight: 500;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-scale.active {
+    background-color: #0d9488;
+    color: white;
+    border-color: #0d9488;
+}
+
+/* Metronome */
+.metronome-controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.bpm-slider-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.bpm-slider-container label {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+}
+
+input[type="range"] {
     width: 100%;
-    justify-content: space-around;
-  }
+    accent-color: #0d9488;
+}
 
-  .nav-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
-
-  main {
-    padding: 1rem;
-  }
-
-  .handpan {
-    width: 290px;
-    height: 290px;
-  }
-
-  .notes-circle .note {
-    width: 55px;
-    height: 55px;
-    font-size: 0.8rem;
-  }
-
-  .ding {
-    width: 80px;
-    height: 80px;
-  }
-
-  .modal-content {
-    padding: 1.5rem;
-  }
-
-  .player-controls {
+/* Lessons */
+.lesson-list {
+    display: flex;
     flex-direction: column;
-  }
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.btn-lesson {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: #334155;
+    color: #cbd5e1;
+    border: 1px solid #475569;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s;
+}
+
+.btn-lesson.active {
+    border-color: #38bdf8;
+    background-color: #1e293b;
+}
+
+.lesson-num {
+    background-color: #38bdf8;
+    color: #0f172a;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.lesson-instructions {
+    background-color: #0f172a;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+.sequence-display {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.seq-step {
+    background-color: #334155;
+    color: #cbd5e1;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+.seq-step.active-step {
+    background-color: #e11d48;
+    color: white;
+}
+
+/* Instrument Area & Handpan */
+.instrument-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.handpan-container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.handpan {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #334155 0%, #1e293b 70%, #0f172a 100%);
+    border: 8px solid #475569;
+    border-radius: 50%;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* Virtual Instrument Pads - ANIMATIONS REMOVED */
+.pad {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #475569 0%, #334155 100%);
+    border: 2px solid #64748b;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #f8fafc;
+    user-select: none;
+    box-shadow: inset 0 4px 6px rgba(255,255,255,0.1), 0 4px 6px rgba(0,0,0,0.3);
+    
+    /* Explicitly disable all transitions and animations */
+    transition: none !important;
+    animation: none !important;
+}
+
+/* Instant state change without any transition or animation */
+.pad:active, .pad.active {
+    background: #0d9488 !important;
+    border-color: #2dd4bf !important;
+    color: #ffffff !important;
+    transform: none !important; /* No scale or movement */
+    animation: none !important; /* No keyframe animations */
+}
+
+/* Highlight state for lessons - static, no animation */
+.pad.highlight {
+    border-color: #e11d48 !important;
+    box-shadow: 0 0 15px #e11d48 !important;
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Pad Positions */
+.ding {
+    width: 30%;
+    height: 30%;
+    top: 35%;
+    left: 35%;
+    background: radial-gradient(circle, #64748b 0%, #475569 100%);
+    border: 3px solid #94a3b8;
+}
+
+.outer-note {
+    width: 20%;
+    height: 20%;
+}
+
+/* Circular arrangement of outer notes */
+.note-1 { top: 10%; left: 40%; }
+.note-2 { top: 20%; left: 68%; }
+.note-3 { top: 45%; left: 75%; }
+.note-4 { top: 70%; left: 60%; }
+.note-5 { top: 70%; left: 20%; }
+.note-6 { top: 45%; left: 5%; }
+.note-7 { top: 20%; left: 12%; }
+.note-8 { top: 10%; left: 40%; display: none; } /* Extra note slot if needed, hidden for 8-note standard */
+
+/* Adjusting positions for a balanced 8-note layout (1 Ding + 8 Notes) */
+.note-1 { top: 8%; left: 40%; }
+.note-2 { top: 18%; left: 65%; }
+.note-3 { top: 40%; left: 74%; }
+.note-4 { top: 65%; left: 63%; }
+.note-5 { top: 74%; left: 40%; }
+.note-6 { top: 65%; left: 17%; }
+.note-7 { top: 40%; left: 6%; }
+.note-8 { top: 18%; left: 15%; display: flex; }
+
+.note-label {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #94a3b8;
+}
+
+.note-pitch {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.visual-feedback-panel {
+    background-color: #1e293b;
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    border: 1px solid #334155;
+    font-size: 0.9rem;
+}
+
+.visual-feedback-panel strong {
+    color: #0d9488;
+}
+
+/* Footer */
+footer {
+    background-color: #0f172a;
+    border-top: 1px solid #334155;
+    padding: 1.5rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: auto;
 }

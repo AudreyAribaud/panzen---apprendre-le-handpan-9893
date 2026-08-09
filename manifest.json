@@ -1,20 +1,20 @@
 {
   "name": "PanZen - Apprendre le Handpan",
   "short_name": "PanZen",
-  "description": "Une application zen et minimaliste pour apprendre et pratiquer le Handpan.",
+  "description": "Une application zen et intuitive pour apprendre le Handpan virtuel sans aucune animation perturbatrice.",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#12161f",
-  "theme_color": "#1e2530",
-  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "any",
   "icons": [
     {
-      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=192&h=192&fit=crop&auto=format",
+      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=192&h=192&q=80",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=512&h=512&fit=crop&auto=format",
+      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=512&h=512&q=80",
       "sizes": "512x512",
       "type": "image/png"
     }
