@@ -2,118 +2,172 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PanZen - Apprendre le Handpan</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a1e24">
-  <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=128&h=128&q=80">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=128&h=128&fit=crop&auto=format">
 </head>
 <body>
   <div class="app-container">
-    <header>
+    <!-- Header -->
+    <header class="app-header">
       <div class="logo-area">
-        <h1>PanZen</h1>
-        <p class="subtitle">L'art du Handpan à portée de main</p>
+        <i class="fa-solid fa-circle-nodes logo-icon"></i>
+        <div>
+          <h1>PanZen</h1>
+          <p class="subtitle">L'art du Handpan à portée de main</p>
+        </div>
       </div>
-      <div class="scale-selector-container">
-        <label for="scale-select">Gamme :</label>
-        <select id="scale-select">
-          <option value="celtic">Ré Celtique Mineur (D Celtic)</option>
-          <option value="kurd">Ré Kurd (D Kurd)</option>
-          <option value="hijaz">Ré Hijaz (D Hijaz)</option>
-          <option value="pygmy">Fa Pygmée (F Pygmy)</option>
-        </select>
+      <div class="header-controls">
+        <button id="btn-metronome" class="control-btn" title="Métronome">
+          <i class="fa-solid fa-clock"></i> <span id="bpm-display">120 BPM</span>
+        </button>
+        <button id="btn-scale" class="control-btn" title="Changer de gamme">
+          <i class="fa-solid fa-music"></i> <span id="scale-display">D Kurd</span>
+        </button>
       </div>
     </header>
 
-    <main>
-      <!-- Onglets de navigation -->
-      <div class="tabs">
-        <button class="tab-btn active" data-tab="play-tab">Jouer</button>
-        <button class="tab-btn" data-tab="lessons-tab">Cours & Exercices</button>
-        <button class="tab-btn" data-tab="metronome-tab">Métronome</button>
-      </div>
+    <!-- Main Content Grid -->
+    <main class="main-content">
+      <!-- Left Panel: Song Library -->
+      <section class="songs-panel">
+        <div class="panel-header">
+          <h2><i class="fa-solid fa-book-open"></i> Bibliothèque de Morceaux</h2>
+          <span class="badge" id="song-count">10 Morceaux</span>
+        </div>
+        <div class="filter-bar">
+          <button class="filter-btn active" data-filter="all">Tous</button>
+          <button class="filter-btn" data-filter="easy">Débutant</button>
+          <button class="filter-btn" data-filter="medium">Intermédiaire</button>
+          <button class="filter-btn" data-filter="hard">Avancé</button>
+        </div>
+        <div class="songs-list" id="songs-container">
+          <!-- Dynamic song cards will be injected here -->
+        </div>
+      </section>
 
-      <!-- Section JOUER -->
-      <section id="play-tab" class="tab-content active">
+      <!-- Center Panel: Virtual Handpan & Visualizer -->
+      <section class="interactive-panel">
+        <!-- Visualizer / Guide Banner -->
+        <div class="guide-banner" id="guide-banner">
+          <div class="guide-info">
+            <h3 id="current-song-title">Mode Libre</h3>
+            <p id="current-song-instruction">Touchez les notes pour explorer les sonorités zen.</p>
+          </div>
+          <div class="guide-controls">
+            <button id="btn-play-demo" class="action-btn secondary hidden" title="Écouter la démo">
+              <i class="fa-solid fa-play"></i> Démo
+            </button>
+            <button id="btn-reset-lesson" class="action-btn danger hidden" title="Recommencer">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual Note Sequence Tracker -->
+        <div class="sequence-tracker hidden" id="sequence-tracker">
+          <!-- Steps will be injected here -->
+        </div>
+
+        <!-- The Handpan Instrument -->
         <div class="handpan-container">
-          <div class="handpan" id="handpan-instrument">
-            <!-- Le Ding (Note centrale) -->
-            <div class="note ding" id="note-ding" data-note-index="0">
+          <div class="handpan" id="handpan">
+            <!-- Ding (Central Note) -->
+            <div class="handpan-note ding" data-note="D3" data-key="Space">
               <span class="note-name">D3</span>
-              <span class="note-num">0</span>
+              <span class="note-key">Espace</span>
             </div>
-            <!-- Les notes périphériques seront générées dynamiquement par JS -->
-            <div class="outer-notes" id="outer-notes-container"></div>
+            <!-- Outer Notes (Circular layout) -->
+            <div class="handpan-note outer-note" style="--angle: 0deg;" data-note="A3" data-key="A">
+              <span class="note-name">A3</span>
+              <span class="note-key">A</span>
+            </div>
+            <div class="handpan-note outer-note" style="--angle: 45deg;" data-note="Bb3" data-key="Z">
+              <span class="note-name">Bb3</span>
+              <span class="note-key">Z</span>
+            </div>
+            <div class="handpan-note outer-note" style="--angle: 90deg;" data-note="C4" data-key="E">
+              <span class="note-name">C4</span>
+              <span class="note-key">E</span>
+            </div>
+            <div class="handpan-note outer-note" style="--angle: 135deg;" data-note="D4" data-key="R">
+              <span class="note-name">D4</span>
+              <span class="note-key">R</span>
+            </div>
+            <div class="handpan-note outer-note" style="--angle: 180deg;" data-note="E4" data-key="T">
+              <span class="note-name">E4</span>
+              <span class="note-key">T</span>
+            </div>
+            <div class="handpan-note outer-note" style="--angle: 225deg;" data-note="F4" data-key="Y">
+              <span class="note-name">F4</span>
+              <span class="note-key">Y</span>
+            </div>
+            <div class="handpan-note outer-note" style="--angle: 270deg;" data-note="G4" data-key="U">
+              <span class="note-name">G4</span>
+              <span class="note-key">U</span>
+            </div>
+            <div class="handpan-note outer-note" style="--angle: 315deg;" data-note="A4" data-key="I">
+              <span class="note-name">A4</span>
+              <span class="note-key">I</span>
+            </div>
           </div>
         </div>
-        <div class="instructions">
-          <p>Touchez ou cliquez sur les notes pour jouer. Utilisez votre clavier (touches 0 à 8) pour une expérience immersive !</p>
-        </div>
-      </section>
 
-      <!-- Section COURS -->
-      <section id="lessons-tab" class="tab-content">
-        <div class="lessons-grid">
-          <div class="lesson-card" data-lesson="1">
-            <h3>1. Le Frappé Fondamental</h3>
-            <p>Apprenez le rebond essentiel pour faire chanter le Ding et la note de base.</p>
-            <div class="sequence">Séquence : <span class="seq-badge">0</span> - <span class="seq-badge">1</span> - <span class="seq-badge">0</span> - <span class="seq-badge">1</span></div>
-            <button class="btn start-lesson-btn">Démarrer</button>
+        <!-- Sound Settings & Recording -->
+        <div class="instrument-footer">
+          <div class="sound-controls">
+            <label><i class="fa-solid fa-volume-high"></i> Volume</label>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.8">
+            <label><i class="fa-solid fa-water"></i> Réverbération</label>
+            <input type="range" id="reverb-slider" min="0" max="1" step="0.1" value="0.6">
           </div>
-          <div class="lesson-card" data-lesson="2">
-            <h3>2. La Valse du Voyageur</h3>
-            <p>Un rythme fluide en 3 temps alternant main gauche et main droite.</p>
-            <div class="sequence">Séquence : <span class="seq-badge">0</span> - <span class="seq-badge">2</span> - <span class="seq-badge">3</span></div>
-            <button class="btn start-lesson-btn">Démarrer</button>
-          </div>
-          <div class="lesson-card" data-lesson="3">
-            <h3>3. L'Envol Celtique</h3>
-            <p>Une mélodie envoûtante utilisant toute la largeur de la gamme.</p>
-            <div class="sequence">Séquence : <span class="seq-badge">1</span> - <span class="seq-badge">3</span> - <span class="seq-badge">5</span> - <span class="seq-badge">4</span> - <span class="seq-badge">2</span></div>
-            <button class="btn start-lesson-btn">Démarrer</button>
-          </div>
-        </div>
-
-        <!-- Zone d'entraînement interactive -->
-        <div class="interactive-practice hidden" id="practice-zone">
-          <div class="practice-header">
-            <h3 id="practice-title">Exercice en cours</h3>
-            <button class="btn btn-danger" id="stop-practice-btn">Quitter</button>
-          </div>
-          <div class="practice-steps" id="practice-steps-container"></div>
-          <p class="practice-feedback" id="practice-feedback">Suivez les notes illuminées !</p>
-        </div>
-      </section>
-
-      <!-- Section MÉTRONOME -->
-      <section id="metronome-tab" class="tab-content">
-        <div class="metronome-card">
-          <div class="tempo-display">
-            <span id="bpm-value">100</span> <span class="bpm-unit">BPM</span>
-          </div>
-          <div class="slider-container">
-            <input type="range" id="tempo-slider" min="40" max="218" value="100">
-          </div>
-          <div class="metronome-controls">
-            <button class="btn" id="metronome-toggle">Démarrer</button>
-          </div>
-          <div class="visual-beat-container">
-            <div class="beat-indicator" id="beat-1"></div>
-            <div class="beat-indicator" id="beat-2"></div>
-            <div class="beat-indicator" id="beat-3"></div>
-            <div class="beat-indicator" id="beat-4"></div>
+          <div class="recording-controls">
+            <button id="btn-record" class="record-btn" title="Enregistrer votre composition">
+              <i class="fa-solid fa-circle"></i> Enregistrer
+            </button>
+            <button id="btn-play-recorded" class="action-btn secondary" disabled title="Écouter l'enregistrement">
+              <i class="fa-solid fa-play"></i> Lire
+            </button>
           </div>
         </div>
       </section>
-    </main>
+    </div>
+  </main>
 
-    <footer>
-      <p>&copy; 2023 PanZen - Conçu pour les amoureux du Handpan. Fonctionne hors-ligne.</p>
-    </footer>
+  <!-- Scale Selector Modal -->
+  <div class="modal-overlay hidden" id="scale-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Choisir une Gamme</h3>
+        <button class="close-modal" id="close-scale-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="scale-option active" data-scale="kurd">
+          <h4>D Kurd (Mineur Naturel)</h4>
+          <p>Mélancolique, mystique et très populaire. Idéal pour la méditation.</p>
+          <span class="scale-notes">D3 | A3, Bb3, C4, D4, E4, F4, G4, A4</span>
+        </div>
+        <div class="scale-option" data-scale="celtic">
+          <h4>D Celtic Minor</h4>
+          <p>Aérien, celtique, évoquant les grands espaces et la brume.</p>
+          <span class="scale-notes">D3 | A3, C4, D4, E4, F4, G4, A4, C5</span>
+        </div>
+        <div class="scale-option" data-scale="pygmy">
+          <h4>F Pygmy</h4>
+          <p>Profond, tribal et hypnotique. Parfait pour les rythmes lents.</p>
+          <span class="scale-notes">F3 | G3, Ab3, C4, Eb4, F4, G4, Ab4, C5</span>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden"></div>
+
   <script src="app.js"></script>
 </body>
 </html>

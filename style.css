@@ -1,15 +1,18 @@
+/* Custom CSS for PanZen - Zen Handpan Learning App */
 :root {
-  --bg-color: #12161a;
-  --card-bg: #1a1f26;
-  --accent-color: #d4a373;
-  --accent-glow: rgba(212, 163, 115, 0.4);
-  --text-color: #f4f1de;
-  --text-muted: #a0aab2;
-  --ding-color: #e9c46a;
-  --note-color: #264653;
-  --note-hover: #2a9d8f;
-  --active-note: #e76f51;
-  --success-color: #2a9d8f;
+  --bg-dark: #0b0f19;
+  --bg-panel: #151f32;
+  --bg-card: #1e293b;
+  --primary: #06b6d4;
+  --primary-glow: rgba(6, 182, 212, 0.4);
+  --accent: #f59e0b;
+  --accent-glow: rgba(245, 158, 11, 0.3);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --danger: #ef4444;
+  --success: #10b981;
+  --handpan-steel: radial-gradient(circle, #334155 0%, #1e293b 70%, #0f172a 100%);
+  --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -17,404 +20,707 @@
   margin: 0;
   padding: 0;
   user-select: none;
-  -webkit-user-select: none;
 }
 
 body {
-  font-family: 'Montserrat', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-family);
   min-height: 100vh;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
 }
 
 .app-container {
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 15px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-}
-
-header {
-  text-align: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 15px;
-}
-
-h1 {
-  font-weight: 600;
-  letter-spacing: 2px;
-  color: var(--accent-color);
-  font-size: 2.2rem;
-}
-
-.subtitle {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-top: 5px;
-}
-
-.scale-selector-container {
-  margin-top: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-select {
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border: 1px solid var(--accent-color);
-  padding: 8px 15px;
-  border-radius: 20px;
-  outline: none;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-/* Onglets */
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  background-color: var(--card-bg);
-  border-radius: 30px;
-  padding: 5px;
-  margin-bottom: 25px;
-}
-
-.tab-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  padding: 10px 20px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-family: inherit;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  flex: 1;
-  text-align: center;
-}
-
-.tab-btn.active {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-}
-
-/* Contenu des onglets */
-.tab-content {
-  display: none;
-  animation: fadeIn 0.4s ease-in-out;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Le Handpan */
-.handpan-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 20px 0;
-}
-
-.handpan {
-  position: relative;
-  width: 320px;
-  height: 320px;
-  background: radial-gradient(circle, #2c3540 0%, #151a21 70%, #0b0d10 100%);
-  border-radius: 50%;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 2px 10px rgba(255,255,255,0.1);
-  border: 6px solid #222a35;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  touch-action: none;
-}
-
-.note {
-  position: absolute;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-  box-shadow: inset 0 4px 6px rgba(0,0,0,0.4), 0 4px 8px rgba(0,0,0,0.3);
-}
-
-.note:active, .note.active {
-  transform: scale(0.95);
-  box-shadow: 0 0 20px var(--active-note), inset 0 2px 4px rgba(0,0,0,0.6);
-  background-color: var(--active-note) !important;
-}
-
-.note.highlight {
-  animation: pulseGlow 1s infinite alternate;
-  border: 2px solid #fff;
-}
-
-@keyframes pulseGlow {
-  from { box-shadow: 0 0 10px var(--accent-color); }
-  to { box-shadow: 0 0 25px var(--accent-color); }
-}
-
-.note-name {
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.note-num {
-  font-size: 0.7rem;
-  opacity: 0.6;
-  margin-top: 2px;
-}
-
-/* Ding (Centre) */
-.ding {
-  width: 85px;
-  height: 85px;
-  background-color: var(--ding-color);
-  color: #12161a;
-  z-index: 10;
-}
-
-/* Notes périphériques */
-.outer-notes {
-  position: absolute;
   width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  pointer-events: none;
 }
 
-.outer-note {
-  width: 65px;
-  height: 65px;
-  background-color: var(--note-color);
-  color: var(--text-color);
-  pointer-events: auto;
-}
-
-.instructions {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  margin-top: 20px;
-  line-height: 1.4;
-}
-
-/* Cours & Exercices */
-.lessons-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-}
-
-.lesson-card {
-  background-color: var(--card-bg);
-  padding: 20px;
-  border-radius: 15px;
-  border-left: 4px solid var(--accent-color);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.lesson-card h3 {
-  font-size: 1.1rem;
-  color: var(--accent-color);
-}
-
-.lesson-card p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-}
-
-.sequence {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.85rem;
-}
-
-.seq-badge {
-  background-color: #2c3540;
-  padding: 3px 8px;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-.btn {
-  background-color: var(--accent-color);
-  color: var(--bg-color);
-  border: none;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-family: inherit;
-  text-align: center;
-}
-
-.btn:hover {
-  background-color: #e9c46a;
-}
-
-.btn-danger {
-  background-color: #e76f51;
-  color: white;
-}
-
-.btn-danger:hover {
-  background-color: #f4a261;
-}
-
-.interactive-practice {
-  background-color: var(--card-bg);
-  padding: 20px;
-  border-radius: 15px;
-  margin-top: 20px;
-  text-align: center;
-  border: 2px solid var(--accent-color);
-}
-
-.practice-header {
+/* Header */
+.app-header {
+  background-color: var(--bg-panel);
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-.practice-steps {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
-}
-
-.step-indicator {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background-color: #2c3540;
+.logo-area {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  border: 2px solid transparent;
+  gap: 1rem;
 }
 
-.step-indicator.active {
-  border-color: var(--accent-color);
-  background-color: rgba(212, 163, 115, 0.2);
+.logo-icon {
+  font-size: 2.2rem;
+  color: var(--primary);
+  filter: drop-shadow(0 0 8px var(--primary-glow));
+  animation: pulse-slow 4s infinite ease-in-out;
 }
 
-.step-indicator.success {
-  background-color: var(--success-color);
-  color: white;
+.logo-area h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  background: linear-gradient(to right, #06b6d4, #3b82f6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.practice-feedback {
-  font-weight: 600;
-  color: var(--accent-color);
-}
-
-/* Métronome */
-.metronome-card {
-  background-color: var(--card-bg);
-  border-radius: 15px;
-  padding: 30px;
-  text-align: center;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.tempo-display {
-  font-size: 3rem;
-  font-weight: 300;
-  color: var(--accent-color);
-  margin-bottom: 10px;
-}
-
-.bpm-unit {
-  font-size: 1rem;
+.subtitle {
+  font-size: 0.8rem;
   color: var(--text-muted);
 }
 
-.slider-container {
-  margin: 20px 0 30px 0;
-}
-
-#tempo-slider {
-  width: 100%;
-  accent-color: var(--accent-color);
-}
-
-.visual-beat-container {
+.header-controls {
   display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 25px;
+  gap: 1rem;
 }
 
-.beat-indicator {
-  width: 15px;
-  height: 15px;
+.control-btn {
+  background-color: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  padding: 0.6rem 1.2rem;
+  border-radius: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* Main Content */
+.main-content {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  flex: 1;
+  height: calc(100vh - 70px);
+  overflow: hidden;
+}
+
+/* Left Panel: Songs */
+.songs-panel {
+  background-color: var(--bg-panel);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.panel-header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badge {
+  background-color: rgba(6, 182, 212, 0.15);
+  color: var(--primary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.8rem 1.5rem;
+  background-color: rgba(0, 0, 0, 0.15);
+  overflow-x: auto;
+}
+
+.filter-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.filter-btn.active, .filter-btn:hover {
+  background-color: var(--bg-card);
+  color: var(--primary);
+}
+
+.songs-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Song Card */
+.song-card {
+  background-color: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.song-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: transparent;
+  transition: background-color 0.3s;
+}
+
+.song-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.song-card.active {
+  background-color: rgba(6, 182, 212, 0.08);
+  border-color: rgba(6, 182, 212, 0.3);
+}
+
+.song-card.active::before {
+  background-color: var(--primary);
+}
+
+.song-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.song-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.difficulty-dot {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background-color: #2c3540;
-  transition: background-color 0.1s ease;
+  display: inline-block;
 }
 
-.beat-indicator.active {
-  background-color: var(--accent-color);
-  box-shadow: 0 0 10px var(--accent-color);
+.difficulty-dot.easy { background-color: var(--success); }
+.difficulty-dot.medium { background-color: var(--accent); }
+.difficulty-dot.hard { background-color: var(--danger); }
+
+.song-desc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.8rem;
+  line-height: 1.3;
+}
+
+.song-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.song-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.learn-badge {
+  background-color: var(--primary);
+  color: var(--bg-dark);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.7rem;
+}
+
+/* Center Panel: Interactive Handpan */
+.interactive-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  justify-content: space-between;
+  align-items: center;
+  overflow-y: auto;
+  background: radial-gradient(circle at center, #111a2e 0%, #0b0f19 100%);
+}
+
+/* Guide Banner */
+.guide-banner {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--bg-panel);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.guide-info h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  color: var(--primary);
+}
+
+.guide-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.guide-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.action-btn.primary {
+  background-color: var(--primary);
+  color: var(--bg-dark);
+}
+
+.action-btn.secondary {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.danger {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
 }
 
 .hidden {
   display: none !important;
 }
 
-footer {
-  text-align: center;
-  margin-top: auto;
-  padding: 20px 0 10px 0;
-  font-size: 0.75rem;
-  color: var(--text-muted);
+/* Sequence Tracker */
+.sequence-tracker {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
 }
 
-/* Responsive */
-@media (min-width: 480px) {
-  .handpan {
-    width: 400px;
-    height: 400px;
+.seq-step {
+  min-width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background-color: var(--bg-card);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.seq-step.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+  transform: scale(1.1);
+}
+
+.seq-step.completed {
+  border-color: var(--success);
+  color: var(--success);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Handpan Instrument Visual */
+.handpan-container {
+  position: relative;
+  width: 450px;
+  height: 450px;
+  margin: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.handpan {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--handpan-steel);
+  position: relative;
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.7),
+    inset 0 4px 20px rgba(255, 255, 255, 0.15),
+    inset 0 -10px 30px rgba(0, 0, 0, 0.8);
+  border: 8px solid #1e293b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.1s ease;
+}
+
+/* Handpan Notes */
+.handpan-note {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #475569 0%, #334155 60%, #1e293b 100%);
+  box-shadow: 
+    inset 0 2px 5px rgba(255, 255, 255, 0.2),
+    0 4px 10px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.handpan-note:hover {
+  transform: scale(1.03);
+  box-shadow: 
+    inset 0 2px 5px rgba(255, 255, 255, 0.3),
+    0 0 15px var(--primary-glow);
+  border-color: var(--primary);
+}
+
+.handpan-note:active, .handpan-note.playing {
+  transform: scale(0.96);
+  background: radial-gradient(circle, var(--primary) 0%, #0891b2 50%, #0f172a 100%);
+  box-shadow: 0 0 25px var(--primary);
+  border-color: #fff;
+}
+
+/* Highlight for learning mode */
+.handpan-note.highlighted {
+  animation: pulse-highlight 1.2s infinite alternate;
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Ding (Central Note) */
+.ding {
+  width: 130px;
+  height: 130px;
+  z-index: 10;
+  background: radial-gradient(circle, #64748b 0%, #334155 50%, #0f172a 100%);
+  box-shadow: 
+    inset 0 4px 10px rgba(255, 255, 255, 0.15),
+    0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Outer Notes positioning using CSS variables and transform */
+.outer-note {
+  width: 85px;
+  height: 85px;
+  --distance: 155px;
+  transform: rotate(var(--angle)) translate(var(--distance)) rotate(calc(-1 * var(--angle)));
+}
+
+.note-name {
+  font-weight: 800;
+  font-size: 1rem;
+  color: #f1f5f9;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.note-key {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+  text-transform: uppercase;
+}
+
+/* Instrument Footer Controls */
+.instrument-footer {
+  width: 100%;
+  max-width: 800px;
+  background-color: var(--bg-panel);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.sound-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.sound-controls label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
+.sound-controls input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+  background: var(--bg-card);
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+}
+
+.recording-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.record-btn {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.record-btn.recording {
+  background-color: var(--danger);
+  color: white;
+  animation: pulse-red 1.5s infinite;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: opacity 0.3s ease;
+}
+
+.modal {
+  background-color: var(--bg-panel);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.scale-option {
+  background-color: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.scale-option:hover {
+  border-color: var(--primary);
+}
+
+.scale-option.active {
+  border-color: var(--primary);
+  background-color: rgba(6, 182, 212, 0.05);
+}
+
+.scale-option h4 {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  color: var(--primary);
+}
+
+.scale-option p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.scale-notes {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: var(--bg-panel);
+  border-left: 4px solid var(--primary);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+/* Animations */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes pulse-highlight {
+  0% { box-shadow: 0 0 10px var(--accent-glow); border-color: var(--accent); }
+  100% { box-shadow: 0 0 25px var(--accent), inset 0 0 10px var(--accent-glow); border-color: #fff; }
+}
+
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .main-content {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
   }
+  
+  .songs-panel {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    max-height: 350px;
+  }
+
+  .handpan-container {
+    width: 340px;
+    height: 340px;
+  }
+
+  .outer-note {
+    width: 65px;
+    height: 65px;
+    --distance: 115px;
+  }
+
   .ding {
     width: 100px;
     height: 100px;
   }
-  .outer-note {
-    width: 80px;
-    height: 80px;
+
+  .instrument-footer {
+    flex-direction: column;
+    gap: 1rem;
   }
-  .lessons-grid {
-    grid-template-columns: 1fr;
+
+  .sound-controls {
+    width: 100%;
   }
 }
