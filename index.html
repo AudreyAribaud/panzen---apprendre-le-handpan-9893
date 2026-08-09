@@ -6,167 +6,120 @@
   <title>PanZen - Apprendre le Handpan</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <meta name="theme-color" content="#0f172a">
-  <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=128&h=128&fit=crop&auto=format">
+  <meta name="theme-color" content="#1e2530">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="app-container">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="logo-area">
-        <i class="fa-solid fa-circle-nodes logo-icon"></i>
-        <div>
-          <h1>PanZen</h1>
-          <p class="subtitle">L'art du Handpan à portée de main</p>
-        </div>
-      </div>
-      <div class="header-controls">
-        <button id="btn-metronome" class="control-btn" title="Métronome">
-          <i class="fa-solid fa-clock"></i> <span id="bpm-display">120 BPM</span>
-        </button>
-        <button id="btn-scale" class="control-btn" title="Changer de gamme">
-          <i class="fa-solid fa-music"></i> <span id="scale-display">D Kurd</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Main Content Grid -->
-    <main class="main-content">
-      <!-- Left Panel: Song Library -->
-      <section class="songs-panel">
-        <div class="panel-header">
-          <h2><i class="fa-solid fa-book-open"></i> Bibliothèque de Morceaux</h2>
-          <span class="badge" id="song-count">10 Morceaux</span>
-        </div>
-        <div class="filter-bar">
-          <button class="filter-btn active" data-filter="all">Tous</button>
-          <button class="filter-btn" data-filter="easy">Débutant</button>
-          <button class="filter-btn" data-filter="medium">Intermédiaire</button>
-          <button class="filter-btn" data-filter="hard">Avancé</button>
-        </div>
-        <div class="songs-list" id="songs-container">
-          <!-- Dynamic song cards will be injected here -->
-        </div>
-      </section>
-
-      <!-- Center Panel: Virtual Handpan & Visualizer -->
-      <section class="interactive-panel">
-        <!-- Visualizer / Guide Banner -->
-        <div class="guide-banner" id="guide-banner">
-          <div class="guide-info">
-            <h3 id="current-song-title">Mode Libre</h3>
-            <p id="current-song-instruction">Touchez les notes pour explorer les sonorités zen.</p>
-          </div>
-          <div class="guide-controls">
-            <button id="btn-play-demo" class="action-btn secondary hidden" title="Écouter la démo">
-              <i class="fa-solid fa-play"></i> Démo
-            </button>
-            <button id="btn-reset-lesson" class="action-btn danger hidden" title="Recommencer">
-              <i class="fa-solid fa-rotate-left"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Visual Note Sequence Tracker -->
-        <div class="sequence-tracker hidden" id="sequence-tracker">
-          <!-- Steps will be injected here -->
-        </div>
-
-        <!-- The Handpan Instrument -->
-        <div class="handpan-container">
-          <div class="handpan" id="handpan">
-            <!-- Ding (Central Note) -->
-            <div class="handpan-note ding" data-note="D3" data-key="Space">
-              <span class="note-name">D3</span>
-              <span class="note-key">Espace</span>
-            </div>
-            <!-- Outer Notes (Circular layout) -->
-            <div class="handpan-note outer-note" style="--angle: 0deg;" data-note="A3" data-key="A">
-              <span class="note-name">A3</span>
-              <span class="note-key">A</span>
-            </div>
-            <div class="handpan-note outer-note" style="--angle: 45deg;" data-note="Bb3" data-key="Z">
-              <span class="note-name">Bb3</span>
-              <span class="note-key">Z</span>
-            </div>
-            <div class="handpan-note outer-note" style="--angle: 90deg;" data-note="C4" data-key="E">
-              <span class="note-name">C4</span>
-              <span class="note-key">E</span>
-            </div>
-            <div class="handpan-note outer-note" style="--angle: 135deg;" data-note="D4" data-key="R">
-              <span class="note-name">D4</span>
-              <span class="note-key">R</span>
-            </div>
-            <div class="handpan-note outer-note" style="--angle: 180deg;" data-note="E4" data-key="T">
-              <span class="note-name">E4</span>
-              <span class="note-key">T</span>
-            </div>
-            <div class="handpan-note outer-note" style="--angle: 225deg;" data-note="F4" data-key="Y">
-              <span class="note-name">F4</span>
-              <span class="note-key">Y</span>
-            </div>
-            <div class="handpan-note outer-note" style="--angle: 270deg;" data-note="G4" data-key="U">
-              <span class="note-name">G4</span>
-              <span class="note-key">U</span>
-            </div>
-            <div class="handpan-note outer-note" style="--angle: 315deg;" data-note="A4" data-key="I">
-              <span class="note-name">A4</span>
-              <span class="note-key">I</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sound Settings & Recording -->
-        <div class="instrument-footer">
-          <div class="sound-controls">
-            <label><i class="fa-solid fa-volume-high"></i> Volume</label>
-            <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.8">
-            <label><i class="fa-solid fa-water"></i> Réverbération</label>
-            <input type="range" id="reverb-slider" min="0" max="1" step="0.1" value="0.6">
-          </div>
-          <div class="recording-controls">
-            <button id="btn-record" class="record-btn" title="Enregistrer votre composition">
-              <i class="fa-solid fa-circle"></i> Enregistrer
-            </button>
-            <button id="btn-play-recorded" class="action-btn secondary" disabled title="Écouter l'enregistrement">
-              <i class="fa-solid fa-play"></i> Lire
-            </button>
-          </div>
-        </div>
-      </section>
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">🪘</div>
+      <h1>PanZen</h1>
     </div>
+    <nav>
+      <button class="nav-btn active" data-target="learn">🎵 Morceaux</button>
+      <button class="nav-btn" data-target="play">✨ Instrument</button>
+      <button class="nav-btn" data-target="metronome">⏱️ Métronome</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- SECTION LEARN (SONGS LIST) -->
+    <section id="learn" class="tab-content active">
+      <div class="search-filter-bar">
+        <input type="text" id="search-input" placeholder="Rechercher un morceau...">
+        <div class="filter-buttons">
+          <button class="filter-btn active" data-level="all">Tous</button>
+          <button class="filter-btn" data-level="Débutant">Débutant</button>
+          <button class="filter-btn" data-level="Intermédiaire">Intermédiaire</button>
+          <button class="filter-btn" data-level="Avancé">Avancé</button>
+        </div>
+      </div>
+      
+      <div class="songs-grid" id="songs-container"></div>
+    </section>
+
+    <!-- SECTION PLAY (VIRTUAL HANDPAN) -->
+    <section id="play" class="tab-content">
+      <div class="instrument-container">
+        <p class="instruction">Touchez les notes pour jouer. Échelle : Ré Mineur Kurd (D3 / A3, Bb3, C4, D4, E4, F4, G4, A4)</p>
+        <div class="handpan">
+          <div class="ding note" data-note="D3" data-freq="146.83">
+            <span class="note-name">Ding</span>
+            <span class="note-pitch">D3</span>
+          </div>
+          <div class="notes-circle">
+            <div class="note note-1" data-note="A3" data-freq="220.00"><span class="note-name">A3</span></div>
+            <div class="note note-2" data-note="Bb3" data-freq="233.08"><span class="note-name">Bb3</span></div>
+            <div class="note note-3" data-note="C4" data-freq="261.63"><span class="note-name">C4</span></div>
+            <div class="note note-4" data-note="D4" data-freq="293.66"><span class="note-name">D4</span></div>
+            <div class="note note-5" data-note="E4" data-freq="329.63"><span class="note-name">E4</span></div>
+            <div class="note note-6" data-note="F4" data-freq="349.23"><span class="note-name">F4</span></div>
+            <div class="note note-7" data-note="G4" data-freq="392.00"><span class="note-name">G4</span></div>
+            <div class="note note-8" data-note="A4" data-freq="440.00"><span class="note-name">A4</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION METRONOME -->
+    <section id="metronome" class="tab-content">
+      <div class="metronome-card">
+        <h2>Métronome Zen</h2>
+        <div class="tempo-display">
+          <span id="tempo-val">90</span> <span class="bpm-unit">BPM</span>
+        </div>
+        <input type="range" id="tempo-slider" min="40" max="200" value="90">
+        <div class="metronome-visual">
+          <div class="beat-indicator"></div>
+          <div class="beat-indicator"></div>
+          <div class="beat-indicator"></div>
+          <div class="beat-indicator"></div>
+        </div>
+        <button id="metronome-toggle" class="btn-primary">Démarrer</button>
+      </div>
+    </section>
   </main>
 
-  <!-- Scale Selector Modal -->
-  <div class="modal-overlay hidden" id="scale-modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h3>Choisir une Gamme</h3>
-        <button class="close-modal" id="close-scale-modal">&times;</button>
+  <!-- MODAL PLAYER -->
+  <div class="modal" id="player-modal">
+    <div class="modal-content">
+      <button class="close-modal">&times;</button>
+      <h2 id="modal-song-title">Titre du morceau</h2>
+      <div class="song-meta">
+        <span id="modal-song-level" class="badge">Niveau</span>
+        <span id="modal-song-tempo">BPM</span>
       </div>
-      <div class="modal-body">
-        <div class="scale-option active" data-scale="kurd">
-          <h4>D Kurd (Mineur Naturel)</h4>
-          <p>Mélancolique, mystique et très populaire. Idéal pour la méditation.</p>
-          <span class="scale-notes">D3 | A3, Bb3, C4, D4, E4, F4, G4, A4</span>
-        </div>
-        <div class="scale-option" data-scale="celtic">
-          <h4>D Celtic Minor</h4>
-          <p>Aérien, celtique, évoquant les grands espaces et la brume.</p>
-          <span class="scale-notes">D3 | A3, C4, D4, E4, F4, G4, A4, C5</span>
-        </div>
-        <div class="scale-option" data-scale="pygmy">
-          <h4>F Pygmy</h4>
-          <p>Profond, tribal et hypnotique. Parfait pour les rythmes lents.</p>
-          <span class="scale-notes">F3 | G3, Ab3, C4, Eb4, F4, G4, Ab4, C5</span>
+      
+      <div class="player-controls">
+        <button id="play-song-btn" class="btn-primary">▶ Écouter le motif</button>
+        <button id="stop-song-btn" class="btn-secondary">⏹ Arrêter</button>
+      </div>
+
+      <div class="tablature-container">
+        <h3>Séquence de notes à jouer :</h3>
+        <div class="tab-sequence" id="modal-song-sequence"></div>
+      </div>
+
+      <div class="interactive-practice">
+        <p>Entraînez-vous en tapant sur le mini-handpan ci-dessous :</p>
+        <div class="mini-handpan">
+          <div class="mini-ding note" data-note="D3" data-freq="146.83">D3</div>
+          <div class="mini-notes">
+            <div class="mini-note note" data-note="A3" data-freq="220.00">A3</div>
+            <div class="mini-note note" data-note="Bb3" data-freq="233.08">Bb3</div>
+            <div class="mini-note note" data-note="C4" data-freq="261.63">C4</div>
+            <div class="mini-note note" data-note="D4" data-freq="293.66">D4</div>
+            <div class="mini-note note" data-note="E4" data-freq="329.63">E4</div>
+            <div class="mini-note note" data-note="F4" data-freq="349.23">F4</div>
+            <div class="mini-note note" data-note="G4" data-freq="392.00">G4</div>
+            <div class="mini-note note" data-note="A4" data-freq="440.00">A4</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Toast Notification -->
-  <div id="toast" class="toast hidden"></div>
 
   <script src="app.js"></script>
 </body>
