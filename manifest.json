@@ -1,17 +1,22 @@
 {
   "name": "PanZen - Apprendre le Handpan",
   "short_name": "PanZen",
-  "description": "Une application interactive pour apprendre et jouer du Handpan avec des gammes personnalisables.",
+  "description": "Une application zen et interactive pour apprendre à jouer du Handpan avec partitions intégrées.",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%231e293b%22 stroke=%22%23fbbf24%22 stroke-width=%224%22/><circle cx=%2250%22 cy=%2250%22 r=%2212%22 fill=%22%23fbbf24%22/></svg>",
+      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=192&q=80",
       "sizes": "192x192",
-      "type": "image/svg+xml"
+      "type": "image/jpeg"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=512&q=80",
+      "sizes": "512x512",
+      "type": "image/jpeg"
     }
   ]
 }

@@ -1,272 +1,145 @@
-// Web Audio Context Setup
+// Audio Engine Setup
 let audioCtx = null;
-let mainGainNode = null;
-
-// Scales Database
-const SCALES = {
-    kurd: {
-        name: "D Mineur Kurd",
-        notes: [
-            { note: "D3", freq: 146.83, label: "Ding D3" },
-            { note: "A3", freq: 220.00, label: "A3" },
-            { note: "Bb3", freq: 233.08, label: "Bb3" },
-            { note: "C4", freq: 261.63, label: "C4" },
-            { note: "D4", freq: 293.66, label: "D4" },
-            { note: "E4", freq: 329.63, label: "E4" },
-            { note: "F4", freq: 349.23, label: "F4" },
-            { note: "G4", freq: 392.00, label: "G4" },
-            { note: "A4", freq: 440.00, label: "A4" },
-            { note: "C5", freq: 523.25, label: "C5" },
-            { note: "D5", freq: 587.33, label: "D5" },
-            { note: "E5", freq: 659.25, label: "E5" }
-        ]
-    },
-    celtic: {
-        name: "Amara / Celtic Minor",
-        notes: [
-            { note: "D3", freq: 146.83, label: "Ding D3" },
-            { note: "A3", freq: 220.00, label: "A3" },
-            { note: "C4", freq: 261.63, label: "C4" },
-            { note: "D4", freq: 293.66, label: "D4" },
-            { note: "E4", freq: 329.63, label: "E4" },
-            { note: "F4", freq: 349.23, label: "F4" },
-            { note: "G4", freq: 392.00, label: "G4" },
-            { note: "A4", freq: 440.00, label: "A4" },
-            { note: "C5", freq: 523.25, label: "C5" },
-            { note: "D5", freq: 587.33, label: "D5" },
-            { note: "E5", freq: 659.25, label: "E5" }
-        ]
-    },
-    pygmy: {
-        name: "F Pygmy",
-        notes: [
-            { note: "F3", freq: 174.61, label: "Ding F3" },
-            { note: "G3", freq: 196.00, label: "G3" },
-            { note: "Ab3", freq: 207.65, label: "Ab3" },
-            { note: "C4", freq: 261.63, label: "C4" },
-            { note: "Eb4", freq: 311.13, label: "Eb4" },
-            { note: "F4", freq: 349.23, label: "F4" },
-            { note: "G4", freq: 392.00, label: "G4" },
-            { note: "Ab4", freq: 415.30, label: "Ab4" },
-            { note: "C5", freq: 523.25, label: "C5" },
-            { note: "Eb5", freq: 622.25, label: "Eb5" },
-            { note: "F5", freq: 698.46, label: "F5" }
-        ]
-    },
-    hijaz: {
-        name: "G Hijaz",
-        notes: [
-            { note: "G3", freq: 196.00, label: "Ding G3" },
-            { note: "Ab3", freq: 207.65, label: "Ab3" },
-            { note: "B3", freq: 246.94, label: "B3" },
-            { note: "C4", freq: 261.63, label: "C4" },
-            { note: "D4", freq: 293.66, label: "D4" },
-            { note: "Eb4", freq: 311.13, label: "Eb4" },
-            { note: "F4", freq: 349.23, label: "F4" },
-            { note: "G4", freq: 392.00, label: "G4" },
-            { note: "Ab4", freq: 415.30, label: "Ab4" },
-            { note: "B4", freq: 493.88, label: "B4" },
-            { note: "C5", freq: 523.25, label: "C5" }
-        ]
-    },
-    integral: {
-        name: "D Integral",
-        notes: [
-            { note: "D3", freq: 146.83, label: "Ding D3" },
-            { note: "A3", freq: 220.00, label: "A3" },
-            { note: "Bb3", freq: 233.08, label: "Bb3" },
-            { note: "C4", freq: 261.63, label: "C4" },
-            { note: "D4", freq: 293.66, label: "D4" },
-            { note: "E4", freq: 329.63, label: "E4" },
-            { note: "F4", freq: 349.23, label: "F4" },
-            { note: "A4", freq: 440.00, label: "A4" },
-            { note: "Bb4", freq: 466.16, label: "Bb4" },
-            { note: "C5", freq: 523.25, label: "C5" },
-            { note: "D5", freq: 587.33, label: "D5" }
-        ]
-    },
-    equinox: {
-        name: "E Equinox",
-        notes: [
-            { note: "E3", freq: 164.81, label: "Ding E3" },
-            { note: "G3", freq: 196.00, label: "G3" },
-            { note: "B3", freq: 246.94, label: "B3" },
-            { note: "C4", freq: 261.63, label: "C4" },
-            { note: "D4", freq: 293.66, label: "D4" },
-            { note: "E4", freq: 329.63, label: "E4" },
-            { note: "F#4", freq: 369.99, label: "F#4" },
-            { note: "G4", freq: 392.00, label: "G4" },
-            { note: "B4", freq: 493.88, label: "B4" },
-            { note: "C5", freq: 523.25, label: "C5" },
-            { note: "D5", freq: 587.33, label: "D5" }
-        ]
-    }
-};
-
-// App State
-let currentScaleKey = "kurd";
-let currentNotesCount = 9;
-let activeNotes = [];
-let isRecording = false;
-let recordedSequence = [];
-let recordStartTime = 0;
-let isPlayingRecord = false;
+let analyser = null;
 let metronomeInterval = null;
 let isMetronomePlaying = false;
-let currentTempo = 100;
+let bpm = 120;
 
-// Lesson State
-let currentLessonSequence = [];
-let lessonUserStep = 0;
-let isPlayingLesson = false;
+// Song Database (D Kurd Scale: D3, A3, Bb3, C4, D4, E4, F4, G4, A4)
+const songs = [
+    {
+        id: 'zen-sunrise',
+        title: 'Zen Sunrise',
+        difficulty: 'Facile',
+        difficultyClass: 'easy',
+        notes: ['D3', 'A3', 'C4', 'D4', 'A3', 'C4', 'D3'],
+        tempo: 100
+    },
+    {
+        id: 'desert-wind',
+        title: 'Le Vent du Désert',
+        difficulty: 'Facile',
+        difficultyClass: 'easy',
+        notes: ['D3', 'Bb3', 'A3', 'G4', 'F4', 'E4', 'D4', 'D3'],
+        tempo: 110
+    },
+    {
+        id: 'raindrops',
+        title: 'Gouttes de Pluie',
+        difficulty: 'Moyen',
+        difficultyClass: 'medium',
+        notes: ['A3', 'C4', 'E4', 'A4', 'G4', 'F4', 'E4', 'C4', 'D3'],
+        tempo: 130
+    },
+    {
+        id: 'mystic-journey',
+        title: 'Voyage Mystique',
+        difficulty: 'Moyen',
+        difficultyClass: 'medium',
+        notes: ['D3', 'A3', 'Bb3', 'D4', 'C4', 'F4', 'E4', 'D4', 'A3', 'D3'],
+        tempo: 95
+    },
+    {
+        id: 'ocean-breeze',
+        title: 'Brise de l\'Océan',
+        difficulty: 'Difficile',
+        difficultyClass: 'hard',
+        notes: ['D3', 'A3', 'D4', 'E4', 'F4', 'G4', 'A4', 'G4', 'F4', 'E4', 'D4', 'A3', 'Bb3', 'A3', 'D3'],
+        tempo: 120
+    }
+];
 
-const LESSONS = {
-    "zen-breath": [0, 1, 2, 3, 2, 1],
-    "celtic-wind": [0, 2, 4, 5, 3, 1, 2],
-    "desert-caravan": [0, 1, 3, 2, 5, 4, 6, 3],
-    "circular-flow": [1, 2, 3, 4, 5, 6, 7, 8]
-};
+// App State
+let currentSong = null;
+let currentNoteIndex = 0;
+let isDemoPlaying = false;
+let demoTimeout = null;
 
-// Initialize App
-window.addEventListener('DOMContentLoaded', () => {
-    populateScaleSelector();
-    renderHandpan();
-    setupEventListeners();
-    setupTabs();
-});
-
+// Initialize Audio Context on first user interaction
 function initAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        mainGainNode = audioCtx.createGain();
-        mainGainNode.gain.setValueAtTime(0.8, audioCtx.currentTime);
-        mainGainNode.connect(audioCtx.destination);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.connect(audioCtx.destination);
+        startVisualizer();
     }
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
     }
 }
 
-function populateScaleSelector() {
-    const select = document.getElementById('scale-select');
-    select.innerHTML = '';
-    for (const [key, scale] of Object.entries(SCALES)) {
-        const option = document.createElement('option');
-        option.value = key;
-        option.textContent = scale.name;
-        select.appendChild(option);
-    }
-}
-
-function renderHandpan() {
-    const container = document.getElementById('handpan-instrument');
-    container.innerHTML = '';
-
-    const scale = SCALES[currentScaleKey];
-    // Slice notes based on user selection
-    activeNotes = scale.notes.slice(0, currentNotesCount);
-
-    // Ding (Center Note)
-    const dingData = activeNotes[0];
-    const dingEl = document.createElement('div');
-    dingEl.className = 'note ding';
-    dingEl.dataset.index = 0;
-    dingEl.innerHTML = `<span class="note-label">${dingData.label}</span>`;
-    container.appendChild(dingEl);
-
-    // Outer Notes
-    const outerNotesCount = activeNotes.length - 1;
-    const radius = 35; // percentage from center
-
-    for (let i = 1; i < activeNotes.length; i++) {
-        const noteData = activeNotes[i];
-        const noteEl = document.createElement('div');
-        noteEl.className = 'note';
-        noteEl.dataset.index = i;
-
-        // Calculate position around circle
-        const angle = ((i - 1) / outerNotesCount) * 2 * Math.PI - Math.PI / 2;
-        const x = 50 + radius * Math.cos(angle);
-        const y = 50 + radius * Math.sin(angle);
-
-        // Dynamic sizing based on frequency (lower notes are slightly larger)
-        const size = Math.max(18, Math.min(26, 1000 / Math.sqrt(noteData.freq)));
-
-        noteEl.style.left = `${x - size / 2}%`;
-        noteEl.style.top = `${y - size / 2}%`;
-        noteEl.style.width = `${size}%`;
-        noteEl.style.height = `${size}%`;
-
-        noteEl.innerHTML = `<span class="note-label">${noteData.label}</span>`;
-        container.appendChild(noteEl);
-    }
-
-    // Re-bind touch/click events
-    bindNoteEvents();
-}
-
-function playHandpanSound(freq) {
-    if (!audioCtx) return;
-
+// Synthesize Handpan Sound
+function playHandpanSound(frequency) {
+    if (!audioCtx) initAudio();
+    
     const now = audioCtx.currentTime;
     
-    // Fundamental
+    // Fundamental node
     const osc1 = audioCtx.createOscillator();
     const gain1 = audioCtx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(freq, now);
-
-    // Octave Harmonic (2x freq)
+    
+    // Harmonic 1 (Octave)
     const osc2 = audioCtx.createOscillator();
     const gain2 = audioCtx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(freq * 2, now);
-
-    // Compound Fifth Harmonic (3x freq)
+    
+    // Harmonic 2 (Compound 5th/3rd)
     const osc3 = audioCtx.createOscillator();
     const gain3 = audioCtx.createGain();
+
+    // Metal resonance/noise tap
+    const noise = audioCtx.createBufferSource();
+    const noiseGain = audioCtx.createGain();
+
+    // Configure Oscillators
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(frequency, now);
+    
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(frequency * 2, now);
+    
     osc3.type = 'sine';
-    osc3.frequency.setValueAtTime(freq * 3, now);
+    osc3.frequency.setValueAtTime(frequency * 3, now);
+
+    // Create quick tap noise
+    const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+    }
+    noise.buffer = buffer;
 
     // Envelopes
-    gain1.gain.setValueAtTime(0.6, now);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+    // Fundamental: quick attack, long decay
+    gain1.gain.setValueAtTime(0, now);
+    gain1.gain.linearRampToValueAtTime(0.8, now + 0.005);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
 
-    gain2.gain.setValueAtTime(0.3, now);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+    // Octave: slightly quieter, faster decay
+    gain2.gain.setValueAtTime(0, now);
+    gain2.gain.linearRampToValueAtTime(0.4, now + 0.005);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
 
-    gain3.gain.setValueAtTime(0.15, now);
-    gain3.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+    // Harmonic: quiet, fast decay
+    gain3.gain.setValueAtTime(0, now);
+    gain3.gain.linearRampToValueAtTime(0.2, now + 0.005);
+    gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
 
-    // Strike Noise (simulates finger tap)
-    const noise = audioCtx.createBufferSource();
-    const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.02, audioCtx.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < noiseBuffer.length; i++) {
-        output[i] = Math.random() * 2 - 1;
-    }
-    noise.buffer = noiseBuffer;
-    
-    const noiseFilter = audioCtx.createBiquadFilter();
-    noiseFilter.type = 'bandpass';
-    noiseFilter.frequency.value = 1000;
-    noiseFilter.Q.value = 2.0;
-
-    const noiseGain = audioCtx.createGain();
-    noiseGain.gain.setValueAtTime(0.15, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+    // Noise tap envelope
+    noiseGain.gain.setValueAtTime(0.3, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
 
     // Connections
     osc1.connect(gain1);
     osc2.connect(gain2);
     osc3.connect(gain3);
-    noise.connect(noiseFilter);
-    noiseFilter.connect(noiseGain);
+    noise.connect(noiseGain);
 
-    gain1.connect(mainGainNode);
-    gain2.connect(mainGainNode);
-    gain3.connect(mainGainNode);
-    noiseGain.connect(mainGainNode);
+    gain1.connect(analyser);
+    gain2.connect(analyser);
+    gain3.connect(analyser);
+    noiseGain.connect(analyser);
 
     // Start & Stop
     osc1.start(now);
@@ -274,263 +147,352 @@ function playHandpanSound(freq) {
     osc3.start(now);
     noise.start(now);
 
-    osc1.stop(now + 2.6);
-    osc2.stop(now + 1.6);
-    osc3.stop(now + 1.1);
+    osc1.stop(now + 2);
+    osc2.stop(now + 1.5);
+    osc3.stop(now + 1);
+    noise.stop(now + 0.1);
 }
 
-function triggerNote(index) {
-    initAudio();
-    const noteData = activeNotes[index];
-    if (!noteData) return;
+// Visualizer Canvas
+function startVisualizer() {
+    const canvas = document.getElementById('visualizer');
+    const canvasCtx = canvas.getContext('2d');
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
 
-    playHandpanSound(noteData.freq);
+    function draw() {
+        requestAnimationFrame(draw);
+        analyser.getByteFrequencyData(dataArray);
 
-    // Visual feedback
-    const noteEl = document.querySelector(`.note[data-index="${index}"]`);
-    if (noteEl) {
-        noteEl.classList.add('active');
-        setTimeout(() => noteEl.classList.remove('active'), 150);
+        canvasCtx.fillStyle = 'rgba(15, 23, 42, 0.3)';
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            barHeight = dataArray[i] / 2;
+            
+            // Gold/Amber gradient for zen feel
+            canvasCtx.fillStyle = `rgba(245, 158, 11, ${barHeight / 100})`;
+            canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+
+            x += barWidth + 1;
+        }
     }
-
-    // Record sequence
-    if (isRecording) {
-        const timeOffset = Date.now() - recordStartTime;
-        recordedSequence.push({ index, time: timeOffset });
+    
+    // Resize canvas to fit container
+    function resizeCanvas() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
     }
-
-    // Lesson verification
-    if (currentLessonSequence.length > 0 && !isPlayingLesson) {
-        verifyLessonStep(index);
-    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    draw();
 }
 
-function bindNoteEvents() {
-    const notes = document.querySelectorAll('.note');
-    notes.forEach(note => {
-        const handleTrigger = (e) => {
-            e.preventDefault();
-            const index = parseInt(note.dataset.index);
-            triggerNote(index);
-        };
-        note.addEventListener('mousedown', handleTrigger);
-        note.addEventListener('touchstart', handleTrigger);
+// Render Song List
+function renderSongs() {
+    const songListContainer = document.getElementById('song-list');
+    songListContainer.innerHTML = '';
+
+    songs.forEach(song => {
+        const songItem = document.createElement('div');
+        songItem.className = 'song-item';
+        songItem.dataset.id = song.id;
+        songItem.innerHTML = `
+            <div class="song-info">
+                <span class="song-title">${song.title}</span>
+                <span class="song-difficulty ${song.difficultyClass}">${song.difficulty} • ${song.notes.length} notes</span>
+            </div>
+            <i class="fa-solid fa-chevron-right song-play-icon"></i>
+        `;
+        songItem.addEventListener('click', () => selectSong(song));
+        songListContainer.appendChild(songItem);
     });
 }
 
-function setupEventListeners() {
-    // Scale Select
-    document.getElementById('scale-select').addEventListener('change', (e) => {
-        currentScaleKey = e.target.value;
-        renderHandpan();
+// Select Song & Build Partition
+function selectSong(song) {
+    // Stop any active demo
+    stopDemo();
+
+    currentSong = song;
+    currentNoteIndex = 0;
+    bpm = song.tempo;
+    document.getElementById('bpm-display').textContent = `${bpm} BPM`;
+
+    // Update active class in list
+    document.querySelectorAll('.song-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.id === song.id);
     });
 
-    // Notes Count
-    document.getElementById('notes-count').addEventListener('change', (e) => {
-        currentNotesCount = parseInt(e.target.value);
-        renderHandpan();
-    });
+    // Switch header mode button
+    document.getElementById('btn-freeplay').classList.remove('active');
 
-    // Volume Slider
-    document.getElementById('volume-slider').addEventListener('input', (e) => {
-        if (mainGainNode) {
-            mainGainNode.gain.setValueAtTime(parseFloat(e.target.value), audioCtx.currentTime);
+    // Build Partition Flow
+    const flowContainer = document.getElementById('partition-flow');
+    flowContainer.innerHTML = '';
+
+    song.notes.forEach((note, index) => {
+        const noteBadge = document.createElement('div');
+        noteBadge.className = `partition-note ${index === 0 ? 'active' : ''}`;
+        noteBadge.dataset.index = index;
+        noteBadge.innerHTML = `<span>${note.replace('b', '♭')}</span>`;
+        flowContainer.appendChild(noteBadge);
+
+        if (index < song.notes.length - 1) {
+            const connector = document.createElement('div');
+            connector.className = 'partition-note-connector';
+            connector.dataset.connectorIndex = index;
+            flowContainer.appendChild(connector);
         }
     });
 
-    // Recording Controls
-    const recordBtn = document.getElementById('record-btn');
-    const playRecBtn = document.getElementById('play-rec-btn');
-    const clearRecBtn = document.getElementById('clear-rec-btn');
-    const recordStatus = document.getElementById('record-status');
+    // Highlight first note on virtual handpan
+    highlightNextNoteOnHandpan();
+}
 
-    recordBtn.addEventListener('click', () => {
-        initAudio();
-        if (!isRecording) {
-            isRecording = true;
-            recordedSequence = [];
-            recordStartTime = Date.now();
-            recordBtn.textContent = 'Arrêter';
-            recordBtn.classList.add('recording');
-            recordStatus.textContent = 'Enregistrement en cours... Jouez sur le handpan.';
-            playRecBtn.disabled = true;
-            clearRecBtn.disabled = true;
+// Highlight Next Note
+function highlightNextNoteOnHandpan() {
+    // Clear all highlights
+    document.querySelectorAll('.handpan-note').forEach(note => {
+        note.classList.remove('highlight');
+    });
+
+    if (currentSong && currentNoteIndex < currentSong.notes.length) {
+        const nextNoteName = currentSong.notes[currentNoteIndex];
+        const noteEl = document.querySelector(`.handpan-note[data-note="${nextNoteName}"]`);
+        if (noteEl) {
+            noteEl.classList.add('highlight');
+        }
+    }
+}
+
+// Advance Partition
+function advancePartition(playedNote) {
+    if (!currentSong) return;
+
+    const expectedNote = currentSong.notes[currentNoteIndex];
+    if (playedNote === expectedNote) {
+        // Mark current as played
+        const currentBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
+        if (currentBadge) {
+            currentBadge.classList.remove('active');
+            currentBadge.classList.add('played');
+        }
+
+        // Color connector
+        const connector = document.querySelector(`.partition-note-connector[data-connector-index="${currentNoteIndex}"]`);
+        if (connector) {
+            connector.classList.add('active');
+        }
+
+        currentNoteIndex++;
+
+        // Check if song finished
+        if (currentNoteIndex >= currentSong.notes.length) {
+            setTimeout(() => {
+                alert('Félicitations ! Vous avez terminé le morceau ! 🎉');
+                resetSong();
+            }, 300);
         } else {
-            isRecording = false;
-            recordBtn.textContent = 'Enregistrer';
-            recordBtn.classList.remove('recording');
-            recordStatus.textContent = `Enregistré : ${recordedSequence.length} notes.`;
-            if (recordedSequence.length > 0) {
-                playRecBtn.disabled = false;
-                clearRecBtn.disabled = false;
+            // Highlight next
+            const nextBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
+            if (nextBadge) {
+                nextBadge.classList.add('active');
+                // Scroll partition flow to keep active note visible
+                nextBadge.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+            highlightNextNoteOnHandpan();
+        }
+    }
+}
+
+// Reset Song
+function resetSong() {
+    if (currentSong) {
+        selectSong(currentSong);
+    }
+}
+
+// Play Demo Automatically
+function playDemo() {
+    if (!currentSong || isDemoPlaying) return;
+    isDemoPlaying = true;
+    currentNoteIndex = 0;
+    
+    // Reset partition visual state
+    document.querySelectorAll('.partition-note').forEach(badge => {
+        badge.className = 'partition-note';
+    });
+    document.querySelectorAll('.partition-note-connector').forEach(conn => {
+        conn.classList.remove('active');
+    });
+
+    const playNextDemoNote = () => {
+        if (!isDemoPlaying || currentNoteIndex >= currentSong.notes.length) {
+            stopDemo();
+            return;
+        }
+
+        const noteName = currentSong.notes[currentNoteIndex];
+        const noteEl = document.querySelector(`.handpan-note[data-note="${noteName}"]`);
+        
+        if (noteEl) {
+            // Trigger visual play
+            noteEl.classList.add('active-play');
+            setTimeout(() => noteEl.classList.remove('active-play'), 200);
+            
+            // Play sound
+            const freq = parseFloat(noteEl.dataset.frequency);
+            playHandpanSound(freq);
+
+            // Update partition visual
+            const currentBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
+            if (currentBadge) {
+                currentBadge.classList.add('played');
+            }
+            const connector = document.querySelector(`.partition-note-connector[data-connector-index="${currentNoteIndex}"]`);
+            if (connector) {
+                connector.classList.add('active');
+            }
+
+            currentNoteIndex++;
+            
+            if (currentNoteIndex < currentSong.notes.length) {
+                const nextBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
+                if (nextBadge) {
+                    nextBadge.classList.add('active');
+                    nextBadge.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
             }
         }
-    });
 
-    playRecBtn.addEventListener('click', () => {
-        if (recordedSequence.length === 0 || isPlayingRecord) return;
-        initAudio();
-        isPlayingRecord = true;
-        playRecBtn.disabled = true;
-        recordStatus.textContent = 'Lecture de l\'enregistrement...';
+        const interval = (60 / bpm) * 1000;
+        demoTimeout = setTimeout(playNextDemoNote, interval);
+    };
 
-        recordedSequence.forEach((step) => {
-            setTimeout(() => {
-                triggerNote(step.index);
-            }, step.time);
-        });
-
-        const totalDuration = recordedSequence[recordedSequence.length - 1].time + 1000;
-        setTimeout(() => {
-            isPlayingRecord = false;
-            playRecBtn.disabled = false;
-            recordStatus.textContent = 'Lecture terminée.';
-        }, totalDuration);
-    });
-
-    clearRecBtn.addEventListener('click', () => {
-        recordedSequence = [];
-        playRecBtn.disabled = true;
-        clearRecBtn.disabled = true;
-        recordStatus.textContent = 'Enregistrement effacé.';
-    });
-
-    // Lesson Controls
-    const playLessonBtn = document.getElementById('play-lesson-btn');
-    const lessonSelect = document.getElementById('lesson-select');
-    const lessonFeedback = document.getElementById('lesson-feedback');
-
-    playLessonBtn.addEventListener('click', () => {
-        initAudio();
-        const lessonKey = lessonSelect.value;
-        const pattern = LESSONS[lessonKey];
-        
-        // Map pattern to current notes count safely
-        currentLessonSequence = pattern.map(idx => idx % currentNotesCount);
-        lessonUserStep = 0;
-        isPlayingLesson = true;
-        playLessonBtn.disabled = true;
-        lessonFeedback.textContent = 'Écoutez attentivement le motif...';
-
-        // Play sequence visually and audibly
-        currentLessonSequence.forEach((noteIdx, step) => {
-            setTimeout(() => {
-                triggerNote(noteIdx);
-                highlightGuideNote(noteIdx);
-            }, step * 600);
-        });
-
-        setTimeout(() => {
-            isPlayingLesson = false;
-            playLessonBtn.disabled = false;
-            lessonFeedback.textContent = 'À vous de jouer ! Reproduisez le motif.';
-            highlightGuideNote(currentLessonSequence[0]);
-        }, currentLessonSequence.length * 600);
-    });
-
-    // Metronome Controls
-    const tempoSlider = document.getElementById('tempo-slider');
-    const tempoVal = document.getElementById('tempo-val');
-    const metroToggle = document.getElementById('metro-toggle');
-
-    tempoSlider.addEventListener('input', (e) => {
-        currentTempo = parseInt(e.target.value);
-        tempoVal.textContent = currentTempo;
-        if (isMetronomePlaying) {
-            stopMetronome();
-            startMetronome();
-        }
-    });
-
-    metroToggle.addEventListener('click', () => {
-        initAudio();
-        if (isMetronomePlaying) {
-            stopMetronome();
-            metroToggle.textContent = 'Démarrer';
-        } else {
-            startMetronome();
-            metroToggle.textContent = 'Arrêter';
-        }
-    });
+    // Highlight first note immediately
+    const firstBadge = document.querySelector(`.partition-note[data-index="0"]`);
+    if (firstBadge) firstBadge.classList.add('active');
+    
+    playNextDemoNote();
 }
 
-function highlightGuideNote(index) {
-    document.querySelectorAll('.note').forEach(n => n.classList.remove('guide-highlight'));
-    const target = document.querySelector(`.note[data-index="${index}"]`);
-    if (target) {
-        target.classList.add('guide-highlight');
+function stopDemo() {
+    isDemoPlaying = false;
+    clearTimeout(demoTimeout);
+    if (currentSong) {
+        currentNoteIndex = 0;
+        // Restore interactive learning state
+        document.querySelectorAll('.partition-note').forEach((badge, idx) => {
+            badge.className = `partition-note ${idx === 0 ? 'active' : ''}`;
+        });
+        document.querySelectorAll('.partition-note-connector').forEach(conn => {
+            conn.classList.remove('active');
+        });
+        highlightNextNoteOnHandpan();
     }
 }
 
-function verifyLessonStep(index) {
-    const expectedIndex = currentLessonSequence[lessonUserStep];
-    const lessonFeedback = document.getElementById('lesson-feedback');
-
-    if (index === expectedIndex) {
-        lessonUserStep++;
-        if (lessonUserStep >= currentLessonSequence.length) {
-            lessonFeedback.textContent = 'Félicitations ! Motif reproduit avec succès ! 🎉';
-            document.querySelectorAll('.note').forEach(n => n.classList.remove('guide-highlight'));
-            currentLessonSequence = [];
-        } else {
-            lessonFeedback.textContent = `Bien ! Continuez... (${lessonUserStep}/${currentLessonSequence.length})`;
-            highlightGuideNote(currentLessonSequence[lessonUserStep]);
-        }
+// Metronome Logic
+function toggleMetronome() {
+    const btn = document.getElementById('btn-metronome');
+    if (isMetronomePlaying) {
+        clearInterval(metronomeInterval);
+        isMetronomePlaying = false;
+        btn.classList.remove('active');
     } else {
-        lessonFeedback.textContent = 'Oups, mauvaise note ! Réessayez ou réécoutez le motif.';
-        lessonUserStep = 0;
-        highlightGuideNote(currentLessonSequence[0]);
+        initAudio();
+        isMetronomePlaying = true;
+        btn.classList.add('active');
+        const interval = (60 / bpm) * 1000;
+        metronomeInterval = setInterval(() => {
+            playMetronomeClick();
+        }, interval);
     }
-}
-
-function startMetronome() {
-    isMetronomePlaying = true;
-    const intervalMs = (60 / currentTempo) * 1000;
-    metronomeInterval = setInterval(() => {
-        playMetronomeClick();
-    }, intervalMs);
-}
-
-function stopMetronome() {
-    isMetronomePlaying = false;
-    clearInterval(metronomeInterval);
 }
 
 function playMetronomeClick() {
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    
     osc.type = 'triangle';
-    osc.frequency.setValueAtTime(800, now);
-    
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-    
+    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch click
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
     osc.connect(gain);
-    gain.connect(mainGainNode);
-    
-    osc.start(now);
-    osc.stop(now + 0.06);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.06);
 }
 
-function setupTabs() {
-    const tabs = document.querySelectorAll('.tab-btn');
-    const contents = document.querySelectorAll('.tab-content');
+// Event Listeners
+function setupEventListeners() {
+    // Handpan Notes Click/Touch
+    document.querySelectorAll('.handpan-note').forEach(noteEl => {
+        const playNote = (e) => {
+            e.preventDefault();
+            initAudio();
+            
+            const note = noteEl.dataset.note;
+            const frequency = parseFloat(noteEl.dataset.frequency);
+            
+            // Play sound
+            playHandpanSound(frequency);
+            
+            // Visual feedback
+            noteEl.classList.add('active-play');
+            setTimeout(() => noteEl.classList.remove('active-play'), 150);
 
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active'));
+            // Advance learning mode if active
+            if (currentSong && !isDemoPlaying) {
+                advancePartition(note);
+            }
+        };
 
-            tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).classList.add('active');
-        });
+        noteEl.addEventListener('mousedown', playNote);
+        noteEl.addEventListener('touchstart', playNote, { passive: false });
     });
+
+    // Free Play Button
+    document.getElementById('btn-freeplay').addEventListener('click', () => {
+        stopDemo();
+        currentSong = null;
+        document.getElementById('btn-freeplay').classList.add('active');
+        document.querySelectorAll('.song-item').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.handpan-note').forEach(note => note.classList.remove('highlight'));
+        document.getElementById('partition-flow').innerHTML = '<p class="empty-msg">Sélectionnez un morceau pour afficher sa partition.</p>';
+    });
+
+    // Metronome Button
+    document.getElementById('btn-metronome').addEventListener('click', toggleMetronome);
+
+    // Demo Play Button
+    document.getElementById('btn-play-demo').addEventListener('click', () => {
+        if (isDemoPlaying) {
+            stopDemo();
+        } else {
+            playDemo();
+        }
+    });
+
+    // Reset Song Button
+    document.getElementById('btn-reset-song').addEventListener('click', resetSong);
 }
 
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(err => console.error('SW registration failed:', err));
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker registered successfully.'))
+            .catch(err => console.log('Service Worker registration failed: ', err));
+    });
 }
+
+// App Initialization
+window.addEventListener('DOMContentLoaded', () => {
+    renderSongs();
+    setupEventListeners();
+});

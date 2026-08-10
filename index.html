@@ -6,115 +6,110 @@
     <title>PanZen - Apprendre le Handpan</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <meta name="theme-color" content="#0f172a">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%231e293b%22 stroke=%22%23fbbf24%22 stroke-width=%224%22/><circle cx=%2250%22 cy=%2250%22 r=%2212%22 fill=%22%23fbbf24%22/></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
     <div class="app-container">
         <header>
-            <div class="logo-container">
-                <div class="logo-icon"></div>
-                <h1>PanZen</h1>
+            <div class="logo-area">
+                <i class="fa-solid fa-circle-notch logo-icon"></i>
+                <div>
+                    <h1>PanZen</h1>
+                    <p class="subtitle">Apprenez le Handpan intuitivement</p>
+                </div>
             </div>
-            <p class="subtitle">Apprenez et jouez du Handpan intuitivement</p>
+            <div class="header-controls">
+                <button id="btn-metronome" class="control-btn" title="Métronome">
+                    <i class="fa-solid fa-drum"></i> <span id="bpm-display">120 BPM</span>
+                </button>
+                <button id="btn-freeplay" class="control-btn active" title="Mode Libre">
+                    <i class="fa-solid fa-hand"></i> Libre
+                </button>
+            </div>
         </header>
 
-        <main>
-            <section class="controls-panel">
-                <div class="control-group">
-                    <label for="scale-select">Gamme du Handpan</label>
-                    <select id="scale-select">
-                        <!-- Options populated by JS -->
-                    </select>
+        <main class="main-content">
+            <!-- Left Panel: Song Library & Partition -->
+            <section class="sidebar">
+                <div class="panel song-selector">
+                    <h2><i class="fa-solid fa-music"></i> Morceaux à jouer</h2>
+                    <div class="song-list" id="song-list">
+                        <!-- Songs will be injected here -->
+                    </div>
                 </div>
 
-                <div class="control-group">
-                    <label for="notes-count">Nombre de notes (avec Ding)</label>
-                    <select id="notes-count">
-                        <option value="7">7 Notes</option>
-                        <option value="8">8 Notes</option>
-                        <option value="9" selected>9 Notes</option>
-                        <option value="10">10 Notes</option>
-                        <option value="11">11 Notes</option>
-                        <option value="12">12 Notes</option>
-                    </select>
-                </div>
-
-                <div class="control-group">
-                    <label for="volume-slider">Volume</label>
-                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.8">
+                <div class="panel partition-panel" id="partition-panel">
+                    <div class="partition-header">
+                        <h2><i class="fa-solid fa-book-open"></i> Partition active</h2>
+                        <div class="partition-actions">
+                            <button id="btn-play-demo" class="action-btn" title="Écouter la démo">
+                                <i class="fa-solid fa-play"></i> Démo
+                            </button>
+                            <button id="btn-reset-song" class="action-btn" title="Recommencer">
+                                <i class="fa-solid fa-rotate-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="partition-container">
+                        <div class="partition-flow" id="partition-flow">
+                            <p class="empty-msg">Sélectionnez un morceau pour afficher sa partition.</p>
+                        </div>
+                    </div>
+                    <div class="partition-instructions" id="partition-instructions">
+                        Choisissez un morceau et jouez les notes en surbrillance !
+                    </div>
                 </div>
             </section>
 
+            <!-- Right Panel: Virtual Handpan -->
             <section class="handpan-section">
-                <div class="handpan-wrapper">
-                    <div class="handpan" id="handpan-instrument">
-                        <!-- Dynamically generated notes -->
-                    </div>
-                </div>
-            </section>
-
-            <section class="interactive-panel">
-                <div class="tabs">
-                    <button class="tab-btn active" data-tab="freeplay">Jeu Libre</button>
-                    <button class="tab-btn" data-tab="lessons">Leçons & Suites</button>
-                    <button class="tab-btn" data-tab="metronome">Métronome</button>
-                </div>
-
-                <div class="tab-content active" id="freeplay">
-                    <div class="panel-card">
-                        <h3>Enregistreur de mélodie</h3>
-                        <p>Enregistrez vos improvisations et réécoutez-les.</p>
-                        <div class="btn-row">
-                            <button id="record-btn" class="btn btn-danger">Enregistrer</button>
-                            <button id="play-rec-btn" class="btn btn-success" disabled>Lire l'enregistrement</button>
-                            <button id="clear-rec-btn" class="btn btn-secondary" disabled>Effacer</button>
+                <div class="handpan-container">
+                    <div class="handpan" id="handpan">
+                        <!-- Ding (Central Note) -->
+                        <div class="handpan-note ding" data-note="D3" data-frequency="146.83">
+                            <span class="note-label">D3</span>
+                            <span class="note-name">Ding</span>
                         </div>
-                        <div id="record-status" class="status-text">Prêt à enregistrer</div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="lessons">
-                    <div class="panel-card">
-                        <h3>Apprendre des motifs</h3>
-                        <p>Choisissez un motif rythmique ou mélodique et reproduisez-le.</p>
-                        <div class="lesson-selector">
-                            <select id="lesson-select">
-                                <option value="zen-breath">Respiration Zen (Simple)</option>
-                                <option value="celtic-wind">Vent Celtique (Moyen)</option>
-                                <option value="desert-caravan">Caravane du Désert (Avancé)</option>
-                                <option value="circular-flow">Flux Circulaire (Technique)</option>
-                            </select>
-                            <button id="play-lesson-btn" class="btn btn-primary">Écouter le motif</button>
+                        <!-- Outer Notes -->
+                        <div class="handpan-note outer-note note-1" data-note="A3" data-frequency="220.00">
+                            <span class="note-label">A3</span>
                         </div>
-                        <div class="lesson-feedback" id="lesson-feedback">
-                            Cliquez sur "Écouter le motif" puis reproduisez les notes illuminées !
+                        <div class="handpan-note outer-note note-2" data-note="Bb3" data-frequency="233.08">
+                            <span class="note-label">B♭3</span>
+                        </div>
+                        <div class="handpan-note outer-note note-3" data-note="C4" data-frequency="261.63">
+                            <span class="note-label">C4</span>
+                        </div>
+                        <div class="handpan-note outer-note note-4" data-note="D4" data-frequency="293.66">
+                            <span class="note-label">D4</span>
+                        </div>
+                        <div class="handpan-note outer-note note-5" data-note="E4" data-frequency="329.63">
+                            <span class="note-label">E4</span>
+                        </div>
+                        <div class="handpan-note outer-note note-6" data-note="F4" data-frequency="349.23">
+                            <span class="note-label">F4</span>
+                        </div>
+                        <div class="handpan-note outer-note note-7" data-note="G4" data-frequency="392.00">
+                            <span class="note-label">G4</span>
+                        </div>
+                        <div class="handpan-note outer-note note-8" data-note="A4" data-frequency="440.00">
+                            <span class="note-label">A4</span>
                         </div>
                     </div>
                 </div>
-
-                <div class="tab-content" id="metronome">
-                    <div class="panel-card">
-                        <h3>Métronome Intégré</h3>
-                        <div class="metronome-controls">
-                            <div class="tempo-display">
-                                <span id="tempo-val">100</span> BPM
-                            </div>
-                            <input type="range" id="tempo-slider" min="40" max="210" value="100">
-                            <div class="btn-row">
-                                <button id="metro-toggle" class="btn btn-primary">Démarrer</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="visualizer-container">
+                    <canvas id="visualizer"></canvas>
                 </div>
             </section>
         </main>
 
         <footer>
-            <p>PanZen &copy; 2023 - Conçu pour la relaxation et l'apprentissage du Handpan.</p>
+            <p>Gamme : Ré Mineur Kurd (D Kurd) • Cliquez ou touchez les notes pour jouer.</p>
         </footer>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
