@@ -7,124 +7,114 @@
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
-    <link rel="icon" type="image/png" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=128&h=128&q=80">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%231e293b%22 stroke=%22%23fbbf24%22 stroke-width=%224%22/><circle cx=%2250%22 cy=%2250%22 r=%2212%22 fill=%22%23fbbf24%22/></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <div class="logo-section">
-                <span class="logo-icon">🛸</span>
-                <div>
-                    <h1>PanZen</h1>
-                    <p class="subtitle">Apprenez le Handpan intuitivement</p>
-                </div>
+    <div class="app-container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-icon"></div>
+                <h1>PanZen</h1>
             </div>
-            <div class="controls-top">
-                <button id="btn-audio-init" class="btn btn-primary">Activer l'Audio</button>
-            </div>
-        </div>
-    </header>
+            <p class="subtitle">Apprenez et jouez du Handpan intuitivement</p>
+        </header>
 
-    <main class="app-container">
-        <section class="sidebar">
-            <div class="card scale-selector">
-                <h2>Gamme de l'instrument</h2>
-                <p class="card-desc">Sélectionnez une ambiance sonore</p>
-                <div class="scale-options">
-                    <button class="btn-scale active" data-scale="kurd">D Kurd (Mineur)</button>
-                    <button class="btn-scale" data-scale="celtic">Am Celtic (Mélancolique)</button>
-                    <button class="btn-scale" data-scale="pygmy">F Pygmy (Mystique)</button>
+        <main>
+            <section class="controls-panel">
+                <div class="control-group">
+                    <label for="scale-select">Gamme du Handpan</label>
+                    <select id="scale-select">
+                        <!-- Options populated by JS -->
+                    </select>
                 </div>
-            </div>
 
-            <div class="card metronome">
-                <h2>Métronome</h2>
-                <div class="metronome-controls">
-                    <button id="btn-metronome" class="btn btn-secondary">Démarrer</button>
-                    <div class="bpm-slider-container">
-                        <label for="bpm-slider"><span id="bpm-value">90</span> BPM</label>
-                        <input type="range" id="bpm-slider" min="60" max="180" value="90">
-                    </div>
+                <div class="control-group">
+                    <label for="notes-count">Nombre de notes (avec Ding)</label>
+                    <select id="notes-count">
+                        <option value="7">7 Notes</option>
+                        <option value="8">8 Notes</option>
+                        <option value="9" selected>9 Notes</option>
+                        <option value="10">10 Notes</option>
+                        <option value="11">11 Notes</option>
+                        <option value="12">12 Notes</option>
+                    </select>
                 </div>
-            </div>
 
-            <div class="card lessons">
-                <h2>Cours & Exercices</h2>
-                <p class="card-desc">Suivez les guides pour apprendre des mélodies</p>
-                <div class="lesson-list">
-                    <button class="btn-lesson active" data-lesson="0">
-                        <span class="lesson-num">1</span>
-                        <span class="lesson-title">Premiers Pas (Alternance)</span>
-                    </button>
-                    <button class="btn-lesson" data-lesson="1">
-                        <span class="lesson-num">2</span>
-                        <span class="lesson-title">Le Voyage du Ding</span>
-                    </button>
-                    <button class="btn-lesson" data-lesson="2">
-                        <span class="lesson-num">3</span>
-                        <span class="lesson-title">Mélodie Zen</span>
-                    </button>
+                <div class="control-group">
+                    <label for="volume-slider">Volume</label>
+                    <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.8">
                 </div>
-                <div class="lesson-instructions">
-                    <p id="lesson-text">Appuyez sur les notes indiquées pour jouer la mélodie.</p>
-                    <div class="sequence-display" id="sequence-display"></div>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section class="instrument-area">
-            <div class="handpan-container">
-                <div class="handpan" id="handpan">
-                    <!-- Ding (Center Note) -->
-                    <div class="pad ding" data-note-index="0" data-note-name="D3">
-                        <span class="note-label">Ding</span>
-                        <span class="note-pitch">D3</span>
-                    </div>
-                    <!-- Outer Notes -->
-                    <div class="pad outer-note note-1" data-note-index="1" data-note-name="A3">
-                        <span class="note-label">1</span>
-                        <span class="note-pitch">A3</span>
-                    </div>
-                    <div class="pad outer-note note-2" data-note-index="2" data-note-name="Bb3">
-                        <span class="note-label">2</span>
-                        <span class="note-pitch">Bb3</span>
-                    </div>
-                    <div class="pad outer-note note-3" data-note-index="3" data-note-name="C4">
-                        <span class="note-label">3</span>
-                        <span class="note-pitch">C4</span>
-                    </div>
-                    <div class="pad outer-note note-4" data-note-index="4" data-note-name="D4">
-                        <span class="note-label">4</span>
-                        <span class="note-pitch">D4</span>
-                    </div>
-                    <div class="pad outer-note note-5" data-note-index="5" data-note-name="E4">
-                        <span class="note-label">5</span>
-                        <span class="note-pitch">E4</span>
-                    </div>
-                    <div class="pad outer-note note-6" data-note-index="6" data-note-name="F4">
-                        <span class="note-label">6</span>
-                        <span class="note-pitch">F4</span>
-                    </div>
-                    <div class="pad outer-note note-7" data-note-index="7" data-note-name="G4">
-                        <span class="note-label">7</span>
-                        <span class="note-pitch">G4</span>
-                    </div>
-                    <div class="pad outer-note note-8" data-note-index="8" data-note-name="A4">
-                        <span class="note-label">8</span>
-                        <span class="note-pitch">A4</span>
+            <section class="handpan-section">
+                <div class="handpan-wrapper">
+                    <div class="handpan" id="handpan-instrument">
+                        <!-- Dynamically generated notes -->
                     </div>
                 </div>
-            </div>
-            <div class="visual-feedback-panel">
-                <p>Note jouée : <strong id="current-played-note">-</strong></p>
-            </div>
-        </section>
-    </main>
+            </section>
 
-    <footer>
-        <p>&copy; 2023 PanZen - Application d'apprentissage du Handpan. Fonctionne hors-ligne.</p>
-    </footer>
+            <section class="interactive-panel">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="freeplay">Jeu Libre</button>
+                    <button class="tab-btn" data-tab="lessons">Leçons & Suites</button>
+                    <button class="tab-btn" data-tab="metronome">Métronome</button>
+                </div>
 
+                <div class="tab-content active" id="freeplay">
+                    <div class="panel-card">
+                        <h3>Enregistreur de mélodie</h3>
+                        <p>Enregistrez vos improvisations et réécoutez-les.</p>
+                        <div class="btn-row">
+                            <button id="record-btn" class="btn btn-danger">Enregistrer</button>
+                            <button id="play-rec-btn" class="btn btn-success" disabled>Lire l'enregistrement</button>
+                            <button id="clear-rec-btn" class="btn btn-secondary" disabled>Effacer</button>
+                        </div>
+                        <div id="record-status" class="status-text">Prêt à enregistrer</div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="lessons">
+                    <div class="panel-card">
+                        <h3>Apprendre des motifs</h3>
+                        <p>Choisissez un motif rythmique ou mélodique et reproduisez-le.</p>
+                        <div class="lesson-selector">
+                            <select id="lesson-select">
+                                <option value="zen-breath">Respiration Zen (Simple)</option>
+                                <option value="celtic-wind">Vent Celtique (Moyen)</option>
+                                <option value="desert-caravan">Caravane du Désert (Avancé)</option>
+                                <option value="circular-flow">Flux Circulaire (Technique)</option>
+                            </select>
+                            <button id="play-lesson-btn" class="btn btn-primary">Écouter le motif</button>
+                        </div>
+                        <div class="lesson-feedback" id="lesson-feedback">
+                            Cliquez sur "Écouter le motif" puis reproduisez les notes illuminées !
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="metronome">
+                    <div class="panel-card">
+                        <h3>Métronome Intégré</h3>
+                        <div class="metronome-controls">
+                            <div class="tempo-display">
+                                <span id="tempo-val">100</span> BPM
+                            </div>
+                            <input type="range" id="tempo-slider" min="40" max="210" value="100">
+                            <div class="btn-row">
+                                <button id="metro-toggle" class="btn btn-primary">Démarrer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>PanZen &copy; 2023 - Conçu pour la relaxation et l'apprentissage du Handpan.</p>
+        </footer>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>

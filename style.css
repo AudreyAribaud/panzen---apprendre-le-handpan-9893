@@ -1,378 +1,406 @@
-/* Reset & Base Styles */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    background-color: #0f172a;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
     color: #f8fafc;
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     overflow-x: hidden;
 }
 
+.app-container {
+    width: 100%;
+    max-width: 900px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 header {
-    background-color: #1e293b;
-    border-bottom: 1px solid #334155;
-    padding: 1rem 2rem;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
-.header-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.logo-section {
+.logo-container {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    justify-content: center;
+    gap: 10px;
 }
 
 .logo-icon {
-    font-size: 2.5rem;
+    width: 30px;
+    height: 30px;
+    background: #fbbf24;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #fbbf24;
 }
 
 h1 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0d9488;
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(to right, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: #94a3b8;
+    margin-top: 5px;
 }
 
-/* Main Layout */
-.app-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 1rem;
+/* Controls Panel */
+.controls-panel {
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 2rem;
-    flex: 1;
-    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    background: rgba(30, 41, 59, 0.7);
+    padding: 15px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
 }
 
-@media (max-width: 900px) {
-    .app-container {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Cards & Sidebar */
-.sidebar {
+.control-group {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 8px;
 }
 
-.card {
-    background-color: #1e293b;
-    border-radius: 12px;
-    padding: 1.5rem;
-    border: 1px solid #334155;
-}
-
-.card h2 {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    color: #38bdf8;
-}
-
-.card-desc {
+.control-group label {
     font-size: 0.85rem;
-    color: #94a3b8;
-    margin-bottom: 1rem;
-}
-
-/* Buttons */
-.btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    border: none;
     font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.btn-primary {
-    background-color: #0d9488;
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #0f766e;
-}
-
-.btn-secondary {
-    background-color: #475569;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background-color: #334155;
-}
-
-/* Scale Selector */
-.scale-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.btn-scale {
-    background-color: #334155;
     color: #cbd5e1;
-    border: 1px solid #475569;
-    padding: 0.75rem;
+}
+
+.control-group select, .control-group input[type="range"] {
+    background: #0f172a;
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px;
     border-radius: 8px;
+    outline: none;
     cursor: pointer;
-    text-align: left;
-    font-weight: 500;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-
-.btn-scale.active {
-    background-color: #0d9488;
-    color: white;
-    border-color: #0d9488;
-}
-
-/* Metronome */
-.metronome-controls {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.bpm-slider-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.bpm-slider-container label {
     font-size: 0.9rem;
-    color: #cbd5e1;
 }
 
-input[type="range"] {
-    width: 100%;
-    accent-color: #0d9488;
+.control-group select:focus {
+    border-color: #fbbf24;
 }
 
-/* Lessons */
-.lesson-list {
+/* Handpan Instrument */
+.handpan-section {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.btn-lesson {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background-color: #334155;
-    color: #cbd5e1;
-    border: 1px solid #475569;
-    padding: 0.75rem;
-    border-radius: 8px;
-    cursor: pointer;
-    text-align: left;
-    transition: background-color 0.2s;
-}
-
-.btn-lesson.active {
-    border-color: #38bdf8;
-    background-color: #1e293b;
-}
-
-.lesson-num {
-    background-color: #38bdf8;
-    color: #0f172a;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    font-weight: bold;
-    font-size: 0.8rem;
-}
-
-.lesson-instructions {
-    background-color: #0f172a;
-    padding: 1rem;
-    border-radius: 8px;
-    border: 1px solid #334155;
-}
-
-.sequence-display {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.seq-step {
-    background-color: #334155;
-    color: #cbd5e1;
-    padding: 0.25rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: bold;
-}
-
-.seq-step.active-step {
-    background-color: #e11d48;
-    color: white;
-}
-
-/* Instrument Area & Handpan */
-.instrument-area {
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
+    margin: 20px 0;
 }
 
-.handpan-container {
+.handpan-wrapper {
     position: relative;
     width: 100%;
     max-width: 450px;
     aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: radial-gradient(circle, rgba(30,41,59,0.4) 0%, rgba(15,23,42,0.8) 70%);
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
 .handpan {
     position: relative;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, #334155 0%, #1e293b 70%, #0f172a 100%);
-    border: 8px solid #475569;
+    background: radial-gradient(circle at 50% 50%, #334155 0%, #1e293b 60%, #0f172a 100%);
     border-radius: 50%;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    border: 8px solid #475569;
+    box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(251, 191, 36, 0.15);
+    touch-action: none;
 }
 
-/* Virtual Instrument Pads - ANIMATIONS REMOVED */
-.pad {
+/* Handpan Notes */
+.note {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, #475569 0%, #334155 100%);
+    background: radial-gradient(circle at 35% 35%, #475569 0%, #1e293b 70%, #0f172a 100%);
     border: 2px solid #64748b;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4), inset 0 2px 5px rgba(255,255,255,0.1);
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    color: #f8fafc;
+    align-items: center;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.2s;
     user-select: none;
-    box-shadow: inset 0 4px 6px rgba(255,255,255,0.1), 0 4px 6px rgba(0,0,0,0.3);
-    
-    /* Explicitly disable all transitions and animations */
-    transition: none !important;
-    animation: none !important;
 }
 
-/* Instant state change without any transition or animation */
-.pad:active, .pad.active {
-    background: #0d9488 !important;
-    border-color: #2dd4bf !important;
-    color: #ffffff !important;
-    transform: none !important; /* No scale or movement */
-    animation: none !important; /* No keyframe animations */
-}
-
-/* Highlight state for lessons - static, no animation */
-.pad.highlight {
-    border-color: #e11d48 !important;
-    box-shadow: 0 0 15px #e11d48 !important;
-    animation: none !important;
-    transition: none !important;
-}
-
-/* Pad Positions */
-.ding {
+.note::after {
+    content: '';
+    position: absolute;
     width: 30%;
     height: 30%;
-    top: 35%;
-    left: 35%;
-    background: radial-gradient(circle, #64748b 0%, #475569 100%);
-    border: 3px solid #94a3b8;
+    background: radial-gradient(circle, #64748b 0%, #334155 100%);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
-
-.outer-note {
-    width: 20%;
-    height: 20%;
-}
-
-/* Circular arrangement of outer notes */
-.note-1 { top: 10%; left: 40%; }
-.note-2 { top: 20%; left: 68%; }
-.note-3 { top: 45%; left: 75%; }
-.note-4 { top: 70%; left: 60%; }
-.note-5 { top: 70%; left: 20%; }
-.note-6 { top: 45%; left: 5%; }
-.note-7 { top: 20%; left: 12%; }
-.note-8 { top: 10%; left: 40%; display: none; } /* Extra note slot if needed, hidden for 8-note standard */
-
-/* Adjusting positions for a balanced 8-note layout (1 Ding + 8 Notes) */
-.note-1 { top: 8%; left: 40%; }
-.note-2 { top: 18%; left: 65%; }
-.note-3 { top: 40%; left: 74%; }
-.note-4 { top: 65%; left: 63%; }
-.note-5 { top: 74%; left: 40%; }
-.note-6 { top: 65%; left: 17%; }
-.note-7 { top: 40%; left: 6%; }
-.note-8 { top: 18%; left: 15%; display: flex; }
 
 .note-label {
+    position: absolute;
+    bottom: 12%;
     font-size: 0.75rem;
-    font-weight: bold;
+    font-weight: 800;
     color: #94a3b8;
+    pointer-events: none;
+    z-index: 2;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
-.note-pitch {
+/* Ding (Center Note) */
+.note.ding {
+    width: 30%;
+    height: 30%;
+    left: 35%;
+    top: 35%;
+    background: radial-gradient(circle at 35% 35%, #64748b 0%, #334155 70%, #0f172a 100%);
+    border: 3px solid #fbbf24;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5), inset 0 2px 5px rgba(255,255,255,0.2);
+}
+
+.note.ding::after {
+    width: 35%;
+    height: 35%;
+    background: radial-gradient(circle, #fbbf24 0%, #d97706 100%);
+}
+
+.note.ding .note-label {
+    color: #fbbf24;
+    bottom: 15%;
+}
+
+/* Active / Played State */
+.note.active {
+    transform: scale(0.95);
+    border-color: #fbbf24;
+    box-shadow: 0 0 25px rgba(251, 191, 36, 0.8), inset 0 0 10px rgba(251, 191, 36, 0.5);
+}
+
+.note.active::after {
+    background: #fbbf24;
+    box-shadow: 0 0 10px #fbbf24;
+}
+
+/* Guide Highlight for Lessons */
+.note.guide-highlight {
+    animation: pulse-guide 1s infinite alternate;
+    border-color: #38bdf8;
+}
+
+@keyframes pulse-guide {
+    0% {
+        box-shadow: 0 0 5px rgba(56, 189, 248, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 20px rgba(56, 189, 248, 1);
+        border-color: #38bdf8;
+    }
+}
+
+/* Interactive Panel & Tabs */
+.interactive-panel {
+    background: rgba(30, 41, 59, 0.7);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.tabs {
+    display: flex;
+    background: rgba(15, 23, 42, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
     font-size: 0.9rem;
-    font-weight: bold;
 }
 
-.visual-feedback-panel {
-    background-color: #1e293b;
-    padding: 0.75rem 1.5rem;
-    border-radius: 20px;
-    border: 1px solid #334155;
+.tab-btn.active {
+    color: #fbbf24;
+    background: rgba(30, 41, 59, 0.5);
+    border-bottom: 3px solid #fbbf24;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.panel-card {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.panel-card h3 {
+    font-size: 1.2rem;
+    color: #fbbf24;
+}
+
+.panel-card p {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+}
+
+.btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
     font-size: 0.9rem;
 }
 
-.visual-feedback-panel strong {
-    color: #0d9488;
+.btn-primary {
+    background: #fbbf24;
+    color: #0f172a;
 }
 
-/* Footer */
+.btn-primary:hover {
+    background: #f59e0b;
+}
+
+.btn-secondary {
+    background: #475569;
+    color: #f8fafc;
+}
+
+.btn-secondary:hover {
+    background: #334155;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-danger.recording {
+    animation: pulse-red 1s infinite alternate;
+}
+
+@keyframes pulse-red {
+    0% { background-color: #ef4444; }
+    100% { background-color: #b91c1c; }
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-success:disabled, .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.status-text {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* Lesson Selector */
+.lesson-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.lesson-selector select {
+    flex: 1;
+    background: #0f172a;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.lesson-feedback {
+    background: rgba(15, 23, 42, 0.5);
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid #fbbf24;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+/* Metronome */
+.metronome-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.tempo-display {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fbbf24;
+}
+
+#tempo-slider {
+    width: 100%;
+    max-width: 300px;
+}
+
 footer {
-    background-color: #0f172a;
-    border-top: 1px solid #334155;
-    padding: 1.5rem;
     text-align: center;
     font-size: 0.8rem;
     color: #64748b;
-    margin-top: auto;
+    margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2rem;
+    }
+    .handpan-wrapper {
+        max-width: 320px;
+    }
+    .note-label {
+        font-size: 0.65rem;
+    }
+    .lesson-selector {
+        flex-direction: column;
+    }
 }
