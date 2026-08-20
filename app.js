@@ -1,498 +1,360 @@
-// Audio Engine Setup
-let audioCtx = null;
-let analyser = null;
-let metronomeInterval = null;
-let isMetronomePlaying = false;
-let bpm = 120;
+// Web Audio API Synthesizer for Handpan
+class HandpanSynth {
+  constructor() {
+    this.ctx = null;
+    this.reverbLevel = 0.5;
+    this.convolver = null;
+  }
 
-// Song Database (D Kurd Scale: D3, A3, Bb3, C4, D4, E4, F4, G4, A4)
-const songs = [
-    {
-        id: 'zen-sunrise',
-        title: 'Zen Sunrise',
-        difficulty: 'Facile',
-        difficultyClass: 'easy',
-        notes: ['D3', 'A3', 'C4', 'D4', 'A3', 'C4', 'D3'],
-        tempo: 100
-    },
-    {
-        id: 'desert-wind',
-        title: 'Le Vent du Désert',
-        difficulty: 'Facile',
-        difficultyClass: 'easy',
-        notes: ['D3', 'Bb3', 'A3', 'G4', 'F4', 'E4', 'D4', 'D3'],
-        tempo: 110
-    },
-    {
-        id: 'raindrops',
-        title: 'Gouttes de Pluie',
-        difficulty: 'Moyen',
-        difficultyClass: 'medium',
-        notes: ['A3', 'C4', 'E4', 'A4', 'G4', 'F4', 'E4', 'C4', 'D3'],
-        tempo: 130
-    },
-    {
-        id: 'mystic-journey',
-        title: 'Voyage Mystique',
-        difficulty: 'Moyen',
-        difficultyClass: 'medium',
-        notes: ['D3', 'A3', 'Bb3', 'D4', 'C4', 'F4', 'E4', 'D4', 'A3', 'D3'],
-        tempo: 95
-    },
-    {
-        id: 'ocean-breeze',
-        title: 'Brise de l\'Océan',
-        difficulty: 'Difficile',
-        difficultyClass: 'hard',
-        notes: ['D3', 'A3', 'D4', 'E4', 'F4', 'G4', 'A4', 'G4', 'F4', 'E4', 'D4', 'A3', 'Bb3', 'A3', 'D3'],
-        tempo: 120
+  init() {
+    if (this.ctx) return;
+    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    this.setupReverb();
+  }
+
+  setupReverb() {
+    // Create a simple synthetic impulse response for reverb
+    const rate = this.ctx.sampleRate;
+    const len = rate * 2.5; // 2.5 seconds reverb
+    const impulse = this.ctx.createBuffer(2, len, rate);
+    const left = impulse.getChannelData(0);
+    const right = impulse.getChannelData(1);
+
+    for (let i = 0; i < len; i++) {
+      const decay = Math.exp(-i / (rate * 0.8));
+      left[i] = (Math.random() * 2 - 1) * decay;
+      right[i] = (Math.random() * 2 - 1) * decay;
     }
-];
 
-// App State
-let currentSong = null;
-let currentNoteIndex = 0;
-let isDemoPlaying = false;
-let demoTimeout = null;
+    this.convolver = this.ctx.createConvolver();
+    this.convolver.buffer = impulse;
 
-// Initialize Audio Context on first user interaction
-function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        analyser.connect(audioCtx.destination);
-        startVisualizer();
+    this.reverbGain = this.ctx.createGain();
+    this.reverbGain.gain.value = this.reverbLevel;
+
+    this.convolver.connect(this.reverbGain);
+    this.reverbGain.connect(this.ctx.destination);
+  }
+
+  setReverbLevel(val) {
+    this.reverbLevel = parseFloat(val);
+    if (this.reverbGain) {
+      this.reverbGain.gain.setValueAtTime(this.reverbLevel, this.ctx.currentTime);
     }
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
+  }
+
+  playNote(frequency) {
+    this.init();
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
     }
-}
 
-// Synthesize Handpan Sound
-function playHandpanSound(frequency) {
-    if (!audioCtx) initAudio();
+    const now = this.ctx.currentTime;
     
-    const now = audioCtx.currentTime;
-    
-    // Fundamental node
-    const osc1 = audioCtx.createOscillator();
-    const gain1 = audioCtx.createGain();
-    
-    // Harmonic 1 (Octave)
-    const osc2 = audioCtx.createOscillator();
-    const gain2 = audioCtx.createGain();
-    
-    // Harmonic 2 (Compound 5th/3rd)
-    const osc3 = audioCtx.createOscillator();
-    const gain3 = audioCtx.createGain();
+    // Handpan sound synthesis: Fundamental + Octave + Compound 5th
+    const osc1 = this.ctx.createOscillator(); // Fundamental
+    const osc2 = this.ctx.createOscillator(); // Octave
+    const osc3 = this.ctx.createOscillator(); // 5th / Harmonic
 
-    // Metal resonance/noise tap
-    const noise = audioCtx.createBufferSource();
-    const noiseGain = audioCtx.createGain();
+    const gain1 = this.ctx.createGain();
+    const gain2 = this.ctx.createGain();
+    const gain3 = this.ctx.createGain();
 
-    // Configure Oscillators
-    osc1.type = 'sine';
+    const masterGain = this.ctx.createGain();
+
+    // Frequencies
     osc1.frequency.setValueAtTime(frequency, now);
-    
-    osc2.type = 'sine';
     osc2.frequency.setValueAtTime(frequency * 2, now);
-    
-    osc3.type = 'sine';
     osc3.frequency.setValueAtTime(frequency * 3, now);
 
-    // Create quick tap noise
-    const bufferSize = audioCtx.sampleRate * 0.02; // 20ms
-    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-    }
-    noise.buffer = buffer;
+    // Waveforms (sine/triangle mix gives a warm handpan tone)
+    osc1.type = 'sine';
+    osc2.type = 'triangle';
+    osc3.type = 'sine';
 
     // Envelopes
-    // Fundamental: quick attack, long decay
+    // Fundamental: slow decay
     gain1.gain.setValueAtTime(0, now);
-    gain1.gain.linearRampToValueAtTime(0.8, now + 0.005);
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+    gain1.gain.linearRampToValueAtTime(0.6, now + 0.01);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
 
-    // Octave: slightly quieter, faster decay
+    // Octave: faster decay
     gain2.gain.setValueAtTime(0, now);
-    gain2.gain.linearRampToValueAtTime(0.4, now + 0.005);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+    gain2.gain.linearRampToValueAtTime(0.3, now + 0.008);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
 
-    // Harmonic: quiet, fast decay
+    // Harmonic: very fast decay
     gain3.gain.setValueAtTime(0, now);
-    gain3.gain.linearRampToValueAtTime(0.2, now + 0.005);
-    gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+    gain3.gain.linearRampToValueAtTime(0.15, now + 0.005);
+    gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
-    // Noise tap envelope
-    noiseGain.gain.setValueAtTime(0.3, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.03);
+    // Strike sound (noise burst for the finger impact)
+    const strikeBuffer = this.ctx.createBuffer(1, this.ctx.sampleRate * 0.02, this.ctx.sampleRate);
+    const strikeData = strikeBuffer.getChannelData(0);
+    for (let i = 0; i < strikeData.length; i++) {
+      strikeData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (this.ctx.sampleRate * 0.005));
+    }
+    const strikeSource = this.ctx.createBufferSource();
+    strikeSource.buffer = strikeBuffer;
+    const strikeGain = this.ctx.createGain();
+    strikeGain.gain.setValueAtTime(0.15, now);
+    strikeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+    strikeSource.connect(strikeGain);
+    strikeGain.connect(masterGain);
 
     // Connections
     osc1.connect(gain1);
     osc2.connect(gain2);
     osc3.connect(gain3);
-    noise.connect(noiseGain);
 
-    gain1.connect(analyser);
-    gain2.connect(analyser);
-    gain3.connect(analyser);
-    noiseGain.connect(analyser);
+    gain1.connect(masterGain);
+    gain2.connect(masterGain);
+    gain3.connect(masterGain);
+
+    // Route to output and reverb
+    masterGain.connect(this.ctx.destination);
+    if (this.convolver) {
+      masterGain.connect(this.convolver);
+    }
 
     // Start & Stop
     osc1.start(now);
     osc2.start(now);
     osc3.start(now);
-    noise.start(now);
+    strikeSource.start(now);
 
-    osc1.stop(now + 2);
-    osc2.stop(now + 1.5);
-    osc3.stop(now + 1);
-    noise.stop(now + 0.1);
+    osc1.stop(now + 1.6);
+    osc2.stop(now + 1.6);
+    osc3.stop(now + 1.6);
+  }
 }
 
-// Visualizer Canvas
-function startVisualizer() {
-    const canvas = document.getElementById('visualizer');
-    const canvasCtx = canvas.getContext('2d');
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+const synth = new HandpanSynth();
 
-    function draw() {
-        requestAnimationFrame(draw);
-        analyser.getByteFrequencyData(dataArray);
+// Navigation Logic
+const navItems = document.querySelectorAll('.nav-item');
+const sections = document.querySelectorAll('.app-section');
 
-        canvasCtx.fillStyle = 'rgba(15, 23, 42, 0.3)';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const barWidth = (canvas.width / bufferLength) * 2.5;
-        let barHeight;
-        let x = 0;
-
-        for (let i = 0; i < bufferLength; i++) {
-            barHeight = dataArray[i] / 2;
-            
-            // Gold/Amber gradient for zen feel
-            canvasCtx.fillStyle = `rgba(245, 158, 11, ${barHeight / 100})`;
-            canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-
-            x += barWidth + 1;
-        }
-    }
+navItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.getAttribute('data-target');
     
-    // Resize canvas to fit container
-    function resizeCanvas() {
-        canvas.width = canvas.parentElement.clientWidth;
-        canvas.height = canvas.parentElement.clientHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    draw();
-}
+    navItems.forEach(nav => nav.classList.remove('active'));
+    sections.forEach(sec => sec.classList.remove('active'));
 
-// Render Song List
-function renderSongs() {
-    const songListContainer = document.getElementById('song-list');
-    songListContainer.innerHTML = '';
+    item.classList.add('active');
+    document.getElementById(target).classList.add('active');
+  });
+});
 
-    songs.forEach(song => {
-        const songItem = document.createElement('div');
-        songItem.className = 'song-item';
-        songItem.dataset.id = song.id;
-        songItem.innerHTML = `
-            <div class="song-info">
-                <span class="song-title">${song.title}</span>
-                <span class="song-difficulty ${song.difficultyClass}">${song.difficulty} • ${song.notes.length} notes</span>
-            </div>
-            <i class="fa-solid fa-chevron-right song-play-icon"></i>
-        `;
-        songItem.addEventListener('click', () => selectSong(song));
-        songListContainer.appendChild(songItem);
-    });
-}
+// Handpan Touch/Play Logic
+const notes = document.querySelectorAll('.handpan-note');
+let activeLessonPattern = [];
+let currentLessonStep = 0;
 
-// Select Song & Build Partition
-function selectSong(song) {
-    // Stop any active demo
-    stopDemo();
-
-    currentSong = song;
-    currentNoteIndex = 0;
-    bpm = song.tempo;
-    document.getElementById('bpm-display').textContent = `${bpm} BPM`;
-
-    // Update active class in list
-    document.querySelectorAll('.song-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.id === song.id);
-    });
-
-    // Switch header mode button
-    document.getElementById('btn-freeplay').classList.remove('active');
-
-    // Build Partition Flow
-    const flowContainer = document.getElementById('partition-flow');
-    flowContainer.innerHTML = '';
-
-    song.notes.forEach((note, index) => {
-        const noteBadge = document.createElement('div');
-        noteBadge.className = `partition-note ${index === 0 ? 'active' : ''}`;
-        noteBadge.dataset.index = index;
-        noteBadge.innerHTML = `<span>${note.replace('b', '♭')}</span>`;
-        flowContainer.appendChild(noteBadge);
-
-        if (index < song.notes.length - 1) {
-            const connector = document.createElement('div');
-            connector.className = 'partition-note-connector';
-            connector.dataset.connectorIndex = index;
-            flowContainer.appendChild(connector);
-        }
-    });
-
-    // Highlight first note on virtual handpan
-    highlightNextNoteOnHandpan();
-}
-
-// Highlight Next Note
-function highlightNextNoteOnHandpan() {
-    // Clear all highlights
-    document.querySelectorAll('.handpan-note').forEach(note => {
-        note.classList.remove('highlight');
-    });
-
-    if (currentSong && currentNoteIndex < currentSong.notes.length) {
-        const nextNoteName = currentSong.notes[currentNoteIndex];
-        const noteEl = document.querySelector(`.handpan-note[data-note="${nextNoteName}"]`);
-        if (noteEl) {
-            noteEl.classList.add('highlight');
-        }
-    }
-}
-
-// Advance Partition
-function advancePartition(playedNote) {
-    if (!currentSong) return;
-
-    const expectedNote = currentSong.notes[currentNoteIndex];
-    if (playedNote === expectedNote) {
-        // Mark current as played
-        const currentBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
-        if (currentBadge) {
-            currentBadge.classList.remove('active');
-            currentBadge.classList.add('played');
-        }
-
-        // Color connector
-        const connector = document.querySelector(`.partition-note-connector[data-connector-index="${currentNoteIndex}"]`);
-        if (connector) {
-            connector.classList.add('active');
-        }
-
-        currentNoteIndex++;
-
-        // Check if song finished
-        if (currentNoteIndex >= currentSong.notes.length) {
-            setTimeout(() => {
-                alert('Félicitations ! Vous avez terminé le morceau ! 🎉');
-                resetSong();
-            }, 300);
-        } else {
-            // Highlight next
-            const nextBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
-            if (nextBadge) {
-                nextBadge.classList.add('active');
-                // Scroll partition flow to keep active note visible
-                nextBadge.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
-            highlightNextNoteOnHandpan();
-        }
-    }
-}
-
-// Reset Song
-function resetSong() {
-    if (currentSong) {
-        selectSong(currentSong);
-    }
-}
-
-// Play Demo Automatically
-function playDemo() {
-    if (!currentSong || isDemoPlaying) return;
-    isDemoPlaying = true;
-    currentNoteIndex = 0;
+notes.forEach(note => {
+  // Support both touch and mouse events for fast response
+  const playHandler = (e) => {
+    e.preventDefault();
+    const freq = parseFloat(note.getAttribute('data-freq'));
+    const noteName = note.getAttribute('data-note');
     
-    // Reset partition visual state
-    document.querySelectorAll('.partition-note').forEach(badge => {
-        badge.className = 'partition-note';
-    });
-    document.querySelectorAll('.partition-note-connector').forEach(conn => {
-        conn.classList.remove('active');
-    });
-
-    const playNextDemoNote = () => {
-        if (!isDemoPlaying || currentNoteIndex >= currentSong.notes.length) {
-            stopDemo();
-            return;
-        }
-
-        const noteName = currentSong.notes[currentNoteIndex];
-        const noteEl = document.querySelector(`.handpan-note[data-note="${noteName}"]`);
-        
-        if (noteEl) {
-            // Trigger visual play
-            noteEl.classList.add('active-play');
-            setTimeout(() => noteEl.classList.remove('active-play'), 200);
-            
-            // Play sound
-            const freq = parseFloat(noteEl.dataset.frequency);
-            playHandpanSound(freq);
-
-            // Update partition visual
-            const currentBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
-            if (currentBadge) {
-                currentBadge.classList.add('played');
-            }
-            const connector = document.querySelector(`.partition-note-connector[data-connector-index="${currentNoteIndex}"]`);
-            if (connector) {
-                connector.classList.add('active');
-            }
-
-            currentNoteIndex++;
-            
-            if (currentNoteIndex < currentSong.notes.length) {
-                const nextBadge = document.querySelector(`.partition-note[data-index="${currentNoteIndex}"]`);
-                if (nextBadge) {
-                    nextBadge.classList.add('active');
-                    nextBadge.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                }
-            }
-        }
-
-        const interval = (60 / bpm) * 1000;
-        demoTimeout = setTimeout(playNextDemoNote, interval);
-    };
-
-    // Highlight first note immediately
-    const firstBadge = document.querySelector(`.partition-note[data-index="0"]`);
-    if (firstBadge) firstBadge.classList.add('active');
+    synth.playNote(freq);
     
-    playNextDemoNote();
-}
+    // Visual feedback
+    note.classList.add('active');
+    setTimeout(() => note.classList.remove('active'), 150);
 
-function stopDemo() {
-    isDemoPlaying = false;
-    clearTimeout(demoTimeout);
-    if (currentSong) {
-        currentNoteIndex = 0;
-        // Restore interactive learning state
-        document.querySelectorAll('.partition-note').forEach((badge, idx) => {
-            badge.className = `partition-note ${idx === 0 ? 'active' : ''}`;
+    // Check lesson progress
+    checkLessonStep(noteName);
+  };
+
+  note.addEventListener('touchstart', playHandler, { passive: false });
+  note.addEventListener('mousedown', playHandler);
+});
+
+// Reverb Control
+const reverbControl = document.getElementById('reverb-control');
+reverbControl.addEventListener('input', (e) => {
+  synth.setReverbLevel(e.target.value);
+});
+
+// Lessons & Practice Logic
+const lessonCards = document.querySelectorAll('.lesson-card');
+const practiceGuide = document.getElementById('practice-guide');
+const currentLessonTitle = document.getElementById('current-lesson-title');
+const visualSequenceContainer = document.getElementById('visual-sequence-container');
+const btnClosePractice = document.getElementById('btn-close-practice');
+
+lessonCards.forEach(card => {
+  const btn = card.querySelector('.btn-play-lesson');
+  btn.addEventListener('click', () => {
+    const patternStr = card.getAttribute('data-pattern');
+    const title = card.querySelector('h3').innerText;
+    
+    activeLessonPattern = patternStr.split(',');
+    currentLessonStep = 0;
+    
+    currentLessonTitle.innerText = title;
+    practiceGuide.classList.remove('hidden');
+    
+    // Build visual steps
+    visualSequenceContainer.innerHTML = '';
+    activeLessonPattern.forEach((note, index) => {
+      const stepEl = document.createElement('div');
+      stepEl.className = `sequence-step ${index === 0 ? 'active' : ''}`;
+      stepEl.innerText = note;
+      visualSequenceContainer.appendChild(stepEl);
+    });
+
+    // Scroll to practice guide smoothly on mobile
+    practiceGuide.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+btnClosePractice.addEventListener('click', () => {
+  practiceGuide.classList.add('hidden');
+  activeLessonPattern = [];
+});
+
+function checkLessonStep(playedNote) {
+  if (activeLessonPattern.length === 0) return;
+
+  const expectedNote = activeLessonPattern[currentLessonStep];
+  if (playedNote === expectedNote) {
+    currentLessonStep++;
+    
+    // Update visual steps
+    const steps = visualSequenceContainer.querySelectorAll('.sequence-step');
+    steps.forEach((step, idx) => {
+      if (idx === currentLessonStep) {
+        step.classList.add('active');
+      } else {
+        step.classList.remove('active');
+      }
+    });
+
+    if (currentLessonStep >= activeLessonPattern.length) {
+      // Lesson completed!
+      setTimeout(() => {
+        alert('Félicitations ! Enchaînement réussi ! 🎉');
+        currentLessonStep = 0;
+        steps.forEach((step, idx) => {
+          if (idx === 0) step.classList.add('active');
+          else step.classList.remove('active');
         });
-        document.querySelectorAll('.partition-note-connector').forEach(conn => {
-            conn.classList.remove('active');
-        });
-        highlightNextNoteOnHandpan();
+      }, 300);
     }
+  }
 }
 
 // Metronome Logic
-function toggleMetronome() {
-    const btn = document.getElementById('btn-metronome');
-    if (isMetronomePlaying) {
-        clearInterval(metronomeInterval);
-        isMetronomePlaying = false;
-        btn.classList.remove('active');
+let metronomeInterval = null;
+let isMetronomePlaying = false;
+let bpm = 120;
+let currentBeat = 0;
+
+const tempoValue = document.getElementById('tempo-value');
+const tempoSlider = document.getElementById('tempo-slider');
+const tempoMinus = document.getElementById('tempo-minus');
+const tempoPlus = document.getElementById('tempo-plus');
+const btnToggleMetronome = document.getElementById('btn-toggle-metronome');
+const beatIndicators = document.querySelectorAll('.beat-indicator');
+
+function updateBpm(newBpm) {
+  bpm = Math.max(40, Math.min(210, newBpm));
+  tempoValue.innerText = bpm;
+  tempoSlider.value = bpm;
+  if (isMetronomePlaying) {
+    stopMetronome();
+    startMetronome();
+  }
+}
+
+tempoSlider.addEventListener('input', (e) => updateBpm(parseInt(e.target.value)));
+tempoMinus.addEventListener('click', () => updateBpm(bpm - 5));
+tempoPlus.addEventListener('click', () => updateBpm(bpm + 5));
+
+function playBeatSound() {
+  synth.init();
+  const now = synth.ctx.currentTime;
+  const osc = synth.ctx.createOscillator();
+  const gain = synth.ctx.createGain();
+  
+  // High pitch for beat 1, lower for others
+  const freq = currentBeat === 0 ? 880 : 440;
+  osc.frequency.setValueAtTime(freq, now);
+  osc.type = 'triangle';
+  
+  gain.gain.setValueAtTime(0.15, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+  
+  osc.connect(gain);
+  gain.connect(synth.ctx.destination);
+  
+  osc.start(now);
+  osc.stop(now + 0.06);
+}
+
+function tick() {
+  // Update visual indicators
+  beatIndicators.forEach((ind, idx) => {
+    if (idx === currentBeat) {
+      ind.classList.add('active');
     } else {
-        initAudio();
-        isMetronomePlaying = true;
-        btn.classList.add('active');
-        const interval = (60 / bpm) * 1000;
-        metronomeInterval = setInterval(() => {
-            playMetronomeClick();
-        }, interval);
+      ind.classList.remove('active');
     }
+  });
+
+  playBeatSound();
+
+  currentBeat = (currentBeat + 1) % 4;
 }
 
-function playMetronomeClick() {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch click
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.06);
+function startMetronome() {
+  const intervalMs = (60 / bpm) * 1000;
+  currentBeat = 0;
+  tick(); // First tick immediately
+  metronomeInterval = setInterval(tick, intervalMs);
+  btnToggleMetronome.innerText = 'Arrêter';
+  btnToggleMetronome.style.backgroundColor = '#ef4444';
+  isMetronomePlaying = true;
 }
 
-// Event Listeners
-function setupEventListeners() {
-    // Handpan Notes Click/Touch
-    document.querySelectorAll('.handpan-note').forEach(noteEl => {
-        const playNote = (e) => {
-            e.preventDefault();
-            initAudio();
-            
-            const note = noteEl.dataset.note;
-            const frequency = parseFloat(noteEl.dataset.frequency);
-            
-            // Play sound
-            playHandpanSound(frequency);
-            
-            // Visual feedback
-            noteEl.classList.add('active-play');
-            setTimeout(() => noteEl.classList.remove('active-play'), 150);
-
-            // Advance learning mode if active
-            if (currentSong && !isDemoPlaying) {
-                advancePartition(note);
-            }
-        };
-
-        noteEl.addEventListener('mousedown', playNote);
-        noteEl.addEventListener('touchstart', playNote, { passive: false });
-    });
-
-    // Free Play Button
-    document.getElementById('btn-freeplay').addEventListener('click', () => {
-        stopDemo();
-        currentSong = null;
-        document.getElementById('btn-freeplay').classList.add('active');
-        document.querySelectorAll('.song-item').forEach(item => item.classList.remove('active'));
-        document.querySelectorAll('.handpan-note').forEach(note => note.classList.remove('highlight'));
-        document.getElementById('partition-flow').innerHTML = '<p class="empty-msg">Sélectionnez un morceau pour afficher sa partition.</p>';
-    });
-
-    // Metronome Button
-    document.getElementById('btn-metronome').addEventListener('click', toggleMetronome);
-
-    // Demo Play Button
-    document.getElementById('btn-play-demo').addEventListener('click', () => {
-        if (isDemoPlaying) {
-            stopDemo();
-        } else {
-            playDemo();
-        }
-    });
-
-    // Reset Song Button
-    document.getElementById('btn-reset-song').addEventListener('click', resetSong);
+function stopMetronome() {
+  clearInterval(metronomeInterval);
+  beatIndicators.forEach(ind => ind.classList.remove('active'));
+  btnToggleMetronome.innerText = 'Démarrer';
+  btnToggleMetronome.style.backgroundColor = 'var(--accent-gold)';
+  isMetronomePlaying = false;
 }
+
+btnToggleMetronome.addEventListener('click', () => {
+  if (isMetronomePlaying) {
+    stopMetronome();
+  } else {
+    startMetronome();
+  }
+});
+
+// Connection Status Monitoring
+window.addEventListener('online', () => {
+  const status = document.getElementById('connection-status');
+  status.innerText = 'En ligne';
+  status.className = 'badge online';
+});
+
+window.addEventListener('offline', () => {
+  const status = document.getElementById('connection-status');
+  status.innerText = 'Hors ligne';
+  status.className = 'badge offline';
+});
 
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-            .then(reg => console.log('Service Worker registered successfully.'))
-            .catch(err => console.log('Service Worker registration failed: ', err));
-    });
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('Service Worker enregistré !', reg))
+      .catch(err => console.warn('Erreur d\'enregistrement du Service Worker', err));
+  });
 }
-
-// App Initialization
-window.addEventListener('DOMContentLoaded', () => {
-    renderSongs();
-    setupEventListeners();
-});

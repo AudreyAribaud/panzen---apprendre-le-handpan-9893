@@ -1,115 +1,174 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PanZen - Apprendre le Handpan</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <meta name="theme-color" content="#0f172a">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PanZen - Apprendre le Handpan</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="app-container">
-        <header>
-            <div class="logo-area">
-                <i class="fa-solid fa-circle-notch logo-icon"></i>
-                <div>
-                    <h1>PanZen</h1>
-                    <p class="subtitle">Apprenez le Handpan intuitivement</p>
-                </div>
-            </div>
-            <div class="header-controls">
-                <button id="btn-metronome" class="control-btn" title="Métronome">
-                    <i class="fa-solid fa-drum"></i> <span id="bpm-display">120 BPM</span>
-                </button>
-                <button id="btn-freeplay" class="control-btn active" title="Mode Libre">
-                    <i class="fa-solid fa-hand"></i> Libre
-                </button>
-            </div>
-        </header>
-
-        <main class="main-content">
-            <!-- Left Panel: Song Library & Partition -->
-            <section class="sidebar">
-                <div class="panel song-selector">
-                    <h2><i class="fa-solid fa-music"></i> Morceaux à jouer</h2>
-                    <div class="song-list" id="song-list">
-                        <!-- Songs will be injected here -->
-                    </div>
-                </div>
-
-                <div class="panel partition-panel" id="partition-panel">
-                    <div class="partition-header">
-                        <h2><i class="fa-solid fa-book-open"></i> Partition active</h2>
-                        <div class="partition-actions">
-                            <button id="btn-play-demo" class="action-btn" title="Écouter la démo">
-                                <i class="fa-solid fa-play"></i> Démo
-                            </button>
-                            <button id="btn-reset-song" class="action-btn" title="Recommencer">
-                                <i class="fa-solid fa-rotate-left"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="partition-container">
-                        <div class="partition-flow" id="partition-flow">
-                            <p class="empty-msg">Sélectionnez un morceau pour afficher sa partition.</p>
-                        </div>
-                    </div>
-                    <div class="partition-instructions" id="partition-instructions">
-                        Choisissez un morceau et jouez les notes en surbrillance !
-                    </div>
-                </div>
-            </section>
-
-            <!-- Right Panel: Virtual Handpan -->
-            <section class="handpan-section">
-                <div class="handpan-container">
-                    <div class="handpan" id="handpan">
-                        <!-- Ding (Central Note) -->
-                        <div class="handpan-note ding" data-note="D3" data-frequency="146.83">
-                            <span class="note-label">D3</span>
-                            <span class="note-name">Ding</span>
-                        </div>
-                        <!-- Outer Notes -->
-                        <div class="handpan-note outer-note note-1" data-note="A3" data-frequency="220.00">
-                            <span class="note-label">A3</span>
-                        </div>
-                        <div class="handpan-note outer-note note-2" data-note="Bb3" data-frequency="233.08">
-                            <span class="note-label">B♭3</span>
-                        </div>
-                        <div class="handpan-note outer-note note-3" data-note="C4" data-frequency="261.63">
-                            <span class="note-label">C4</span>
-                        </div>
-                        <div class="handpan-note outer-note note-4" data-note="D4" data-frequency="293.66">
-                            <span class="note-label">D4</span>
-                        </div>
-                        <div class="handpan-note outer-note note-5" data-note="E4" data-frequency="329.63">
-                            <span class="note-label">E4</span>
-                        </div>
-                        <div class="handpan-note outer-note note-6" data-note="F4" data-frequency="349.23">
-                            <span class="note-label">F4</span>
-                        </div>
-                        <div class="handpan-note outer-note note-7" data-note="G4" data-frequency="392.00">
-                            <span class="note-label">G4</span>
-                        </div>
-                        <div class="handpan-note outer-note note-8" data-note="A4" data-frequency="440.00">
-                            <span class="note-label">A4</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="visualizer-container">
-                    <canvas id="visualizer"></canvas>
-                </div>
-            </section>
-        </main>
-
-        <footer>
-            <p>Gamme : Ré Mineur Kurd (D Kurd) • Cliquez ou touchez les notes pour jouer.</p>
-        </footer>
+  <header class="app-header">
+    <div class="logo-container">
+      <span class="logo-icon">🪐</span>
+      <h1>PanZen</h1>
     </div>
+    <div class="status-bar">
+      <span id="connection-status" class="badge online">En ligne</span>
+    </div>
+  </header>
 
-    <script src="app.js"></script>
+  <main class="app-content">
+    <!-- SECTION 1: VIRTUAL HANDPAN (JOUER) -->
+    <section id="section-play" class="app-section active">
+      <div class="section-intro">
+        <h2>Mon Handpan</h2>
+        <p class="subtitle">Touchez les notes pour jouer. Multi-touch optimisé.</p>
+      </div>
+      
+      <div class="handpan-container">
+        <div class="handpan">
+          <!-- Ding (Central Note) -->
+          <button class="handpan-note ding" data-note="D3" data-freq="146.83">
+            <span class="note-name">D3</span>
+            <span class="note-role">Ding</span>
+          </button>
+          <!-- Outer Notes (D Kurd Scale) -->
+          <button class="handpan-note outer note-1" data-note="A3" data-freq="220.00" style="--angle: 0deg;">
+            <span class="note-name">A3</span>
+          </button>
+          <button class="handpan-note outer note-2" data-note="Bb3" data-freq="233.08" style="--angle: 45deg;">
+            <span class="note-name">Bb3</span>
+          </button>
+          <button class="handpan-note outer note-3" data-note="C4" data-freq="261.63" style="--angle: 90deg;">
+            <span class="note-name">C4</span>
+          </button>
+          <button class="handpan-note outer note-4" data-note="D4" data-freq="293.66" style="--angle: 135deg;">
+            <span class="note-name">D4</span>
+          </button>
+          <button class="handpan-note outer note-5" data-note="E4" data-freq="329.63" style="--angle: 180deg;">
+            <span class="note-name">E4</span>
+          </button>
+          <button class="handpan-note outer note-6" data-note="F4" data-freq="349.23" style="--angle: 225deg;">
+            <span class="note-name">F4</span>
+          </button>
+          <button class="handpan-note outer note-7" data-note="G4" data-freq="392.00" style="--angle: 270deg;">
+            <span class="note-name">G4</span>
+          </button>
+          <button class="handpan-note outer note-8" data-note="A4" data-freq="440.00" style="--angle: 315deg;">
+            <span class="note-name">A4</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sound-settings">
+        <label for="reverb-control">Réverbération</label>
+        <input type="range" id="reverb-control" min="0" max="1" step="0.1" value="0.5">
+      </div>
+    </section>
+
+    <!-- SECTION 2: LESSONS (COURS) -->
+    <section id="section-lessons" class="app-section">
+      <div class="section-intro">
+        <h2>Cours & Rythmes</h2>
+        <p class="subtitle">Apprenez les enchaînements de base pas à pas.</p>
+      </div>
+
+      <div class="lessons-list">
+        <div class="lesson-card" data-pattern="D3,A3,C4,A3">
+          <div class="lesson-info">
+            <span class="lesson-difficulty easy">Facile</span>
+            <h3>Le Pas Alterné</h3>
+            <p class="lesson-sequence">D3 → A3 → C4 → A3</p>
+          </div>
+          <button class="btn-play-lesson">S'exercer</button>
+        </div>
+
+        <div class="lesson-card" data-pattern="D3,Bb3,D4,Bb3,C4,A3">
+          <div class="lesson-info">
+            <span class="lesson-difficulty medium">Moyen</span>
+            <h3>La Vague Zen</h3>
+            <p class="lesson-sequence">D3 → Bb3 → D4 → Bb3 → C4 → A3</p>
+          </div>
+          <button class="btn-play-lesson">S'exercer</button>
+        </div>
+
+        <div class="lesson-card" data-pattern="D3,A4,G4,F4,E4,D4,C4,Bb3,A3">
+          <div class="lesson-info">
+            <span class="lesson-difficulty hard">Difficile</span>
+            <h3>Descente de la Cascade</h3>
+            <p class="lesson-sequence">D3 → A4 → G4 → F4 → E4 → D4 → C4</p>
+          </div>
+          <button class="btn-play-lesson">S'exercer</button>
+        </div>
+      </div>
+
+      <!-- Interactive Practice Guide -->
+      <div id="practice-guide" class="practice-guide hidden">
+        <div class="guide-header">
+          <h4>Pratique guidée : <span id="current-lesson-title">Aucune</span></h4>
+          <button id="btn-close-practice" class="btn-close">&times;</button>
+        </div>
+        <div class="visual-sequence" id="visual-sequence-container">
+          <!-- Dynamic steps will be injected here -->
+        </div>
+        <p class="practice-instruction">Touchez les notes sur le handpan ci-dessus pour suivre le rythme !</p>
+      </div>
+    </section>
+
+    <!-- SECTION 3: METRONOME -->
+    <section id="section-metronome" class="app-section">
+      <div class="section-intro">
+        <h2>Métronome</h2>
+        <p class="subtitle">Gardez le tempo parfait pour vos sessions.</p>
+      </div>
+
+      <div class="metronome-card">
+        <div class="tempo-display">
+          <span id="tempo-value">120</span>
+          <span class="tempo-unit">BPM</span>
+        </div>
+
+        <div class="tempo-slider-container">
+          <button class="btn-tempo-adjust" id="tempo-minus">-</button>
+          <input type="range" id="tempo-slider" min="40" max="210" value="120">
+          <button class="btn-tempo-adjust" id="tempo-plus">+</button>
+        </div>
+
+        <div class="visual-beat-container">
+          <div class="beat-indicator" id="beat-1"></div>
+          <div class="beat-indicator" id="beat-2"></div>
+          <div class="beat-indicator" id="beat-3"></div>
+          <div class="beat-indicator" id="beat-4"></div>
+        </div>
+
+        <button id="btn-toggle-metronome" class="btn-primary">Démarrer</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- BOTTOM NAVIGATION BAR (MOBILE OPTIMIZED) -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-target="section-play">
+      <span class="nav-icon">🪐</span>
+      <span class="nav-label">Jouer</span>
+    </button>
+    <button class="nav-item" data-target="section-lessons">
+      <span class="nav-icon">📖</span>
+      <span class="nav-label">Cours</span>
+    </button>
+    <button class="nav-item" data-target="section-metronome">
+      <span class="nav-icon">⏱️</span>
+      <span class="nav-label">Tempo</span>
+    </button>
+  </nav>
+
+  <script src="app.js"></script>
 </body>
 </html>
