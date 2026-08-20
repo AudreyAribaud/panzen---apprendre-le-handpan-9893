@@ -1,551 +1,396 @@
-// Web Audio API Synthesizer for Handpan Sounds
-class HandpanSynth {
-  constructor() {
-    this.ctx = null;
-    this.frequencies = {
-      'D3': 146.83,
-      'A3': 220.00,
-      'Bb3': 233.08,
-      'C4': 261.63,
-      'D4': 293.66,
-      'E4': 329.63,
-      'F4': 349.23,
-      'G4': 392.00,
-      'A4': 440.00
-    };
-  }
+// Web Audio API Setup
+let audioCtx = null;
 
-  init() {
-    if (!this.ctx) {
-      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-  }
-
-  playNote(noteName) {
-    this.init();
-    const freq = this.frequencies[noteName];
-    if (!freq) return;
-
-    const now = this.ctx.currentTime;
-
-    // Fundamental
-    const osc1 = this.ctx.createOscillator();
-    const gain1 = this.ctx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(freq, now);
-
-    // Octave overtone (typical of handpan)
-    const osc2 = this.ctx.createOscillator();
-    const gain2 = this.ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(freq * 2, now);
-
-    // Compound fifth overtone (typical of handpan)
-    const osc3 = this.ctx.createOscillator();
-    const gain3 = this.ctx.createGain();
-    osc3.type = 'sine';
-    osc3.frequency.setValueAtTime(freq * 3, now);
-
-    // Bandpass filter to simulate the steel chamber resonance
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(freq, now);
-    filter.Q.setValueAtTime(1.5, now);
-
-    // Envelopes
-    gain1.gain.setValueAtTime(0, now);
-    gain1.gain.linearRampToValueAtTime(0.8, now + 0.005); // Quick strike
-    gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.8); // Long decay
-
-    gain2.gain.setValueAtTime(0, now);
-    gain2.gain.linearRampToValueAtTime(0.3, now + 0.005);
-    gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-
-    gain3.gain.setValueAtTime(0, now);
-    gain3.gain.linearRampToValueAtTime(0.15, now + 0.005);
-    gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-
-    // Connections
-    osc1.connect(gain1);
-    osc2.connect(gain2);
-    osc3.connect(gain3);
-
-    gain1.connect(filter);
-    gain2.connect(filter);
-    gain3.connect(filter);
-
-    filter.connect(this.ctx.destination);
-
-    osc1.start(now);
-    osc2.start(now);
-    osc3.start(now);
-
-    osc1.stop(now + 2.0);
-    osc2.stop(now + 2.0);
-    osc3.stop(now + 2.0);
-  }
-}
-
-const synth = new HandpanSynth();
-
-// State Management
-const state = {
-  currentView: 'play',
-  soundEnabled: false,
-  bpm: 90,
-  metronomeInterval: null,
-  isMetronomePlaying: false,
-  completedLessons: JSON.parse(localStorage.getItem('panzen_completed_lessons')) || [],
-  history: JSON.parse(localStorage.getItem('panzen_history')) || [],
-  currentPracticeLesson: null,
-  practiceActive: false,
-  practiceNotes: [],
-  practiceScore: 0,
-  practiceTotal: 0
+// Handpan Scale: D Minor (Kurd / Celtic)
+const NOTES = {
+  'D3': { freq: 146.83, label: 'Ding (D3)' },
+  'A3': { freq: 220.00, label: 'A3' },
+  'Bb3': { freq: 233.08, label: 'B♭3' },
+  'C4': { freq: 261.63, label: 'C4' },
+  'D4': { freq: 293.66, label: 'D4' },
+  'E4': { freq: 329.63, label: 'E4' },
+  'F4': { freq: 349.23, label: 'F4' },
+  'G4': { freq: 392.00, label: 'G4' },
+  'A4': { freq: 440.00, label: 'A4' }
 };
 
-// Lessons Data
-const lessons = [
+// Exercises List
+const EXERCISES = [
   {
-    id: 'lesson-1',
-    title: 'Le Ding Fondamental',
-    desc: 'Apprenez à frapper le Ding central avec le pouce gauche.',
-    difficulty: 'Facile',
-    difficultyClass: 'difficulty-easy',
-    notes: ['D3', 'D3', 'D3', 'D3'],
-    hands: ['G', 'G', 'G', 'G']
+    name: "1. Échelle Ascendante",
+    sequence: ["D3", "A3", "Bb3", "C4", "D4", "E4", "F4", "G4", "A4"],
+    description: "Montez doucement la gamme du Ding jusqu'à la note la plus aiguë."
   },
   {
-    id: 'lesson-2',
-    title: 'Alternance Gauche-Droite',
-    desc: 'Jouez une alternance simple entre le Ding et la note A3.',
-    difficulty: 'Facile',
-    difficultyClass: 'difficulty-easy',
-    notes: ['D3', 'A3', 'D3', 'A3'],
-    hands: ['G', 'D', 'G', 'D']
+    name: "2. Vague Zen",
+    sequence: ["D3", "A3", "D4", "A3", "F4", "D4", "A4", "G4"],
+    description: "Un motif fluide alternant entre notes graves et aiguës."
   },
   {
-    id: 'lesson-3',
-    title: 'La Valse du Handpan',
-    desc: 'Un rythme à 3 temps fluide et mélodique.',
-    difficulty: 'Moyen',
-    difficultyClass: 'difficulty-medium',
-    notes: ['D3', 'A3', 'Bb3', 'D3', 'A3', 'Bb3'],
-    hands: ['G', 'D', 'G', 'G', 'D', 'G']
+    name: "3. Battement de Cœur",
+    sequence: ["D3", "Bb3", "G4", "Bb3", "D3", "A3", "F4", "A3"],
+    description: "Un rythme méditatif et ancré."
   },
   {
-    id: 'lesson-4',
-    title: 'Ascension de la Gamme',
-    desc: 'Montez la gamme de D Kurd pas à pas.',
-    difficulty: 'Moyen',
-    difficultyClass: 'difficulty-medium',
-    notes: ['A3', 'Bb3', 'C4', 'D4', 'E4', 'F4', 'G4', 'A4'],
-    hands: ['G', 'G', 'D', 'D', 'G', 'D', 'D', 'G']
-  },
-  {
-    id: 'lesson-5',
-    title: 'Le Rythme Takadimi',
-    desc: 'Un motif rythmique rapide et dynamique.',
-    difficulty: 'Difficile',
-    difficultyClass: 'difficulty-hard',
-    notes: ['D3', 'F4', 'E4', 'D4', 'D3', 'F4', 'E4', 'D4'],
-    hands: ['G', 'D', 'G', 'D', 'G', 'D', 'G', 'D']
+    name: "4. Voyage Intérieur",
+    sequence: ["D3", "C4", "E4", "G4", "F4", "D4", "Bb3", "A3"],
+    description: "Une mélodie complexe et enveloppante."
   }
 ];
 
+// App State
+let currentMode = 'free-play'; // 'free-play' or 'lessons'
+let currentExerciseIndex = 0;
+let isPlayingDemo = false;
+let isPracticeMode = false;
+let practiceStep = 0;
+let demoTimeoutIds = [];
+
 // DOM Elements
-const views = document.querySelectorAll('.view');
-const navItems = document.querySelectorAll('.nav-item');
-const btnSoundInit = document.getElementById('btn-sound-init');
-const soundIcon = document.getElementById('sound-icon');
-const bpmRange = document.getElementById('bpm-range');
-const bpmDisplay = document.getElementById('bpm-display');
-const btnMetronomeToggle = document.getElementById('btn-metronome-toggle');
-const lessonsContainer = document.getElementById('lessons-container');
-const practiceHandpanSvg = document.getElementById('practice-handpan-svg');
-const btnStartPractice = document.getElementById('btn-start-practice');
-const feedbackText = document.getElementById('feedback-text');
-const scrollingNotesContainer = document.getElementById('scrolling-notes-container');
+const btnFreePlay = document.getElementById('btn-free-play');
+const btnLessons = document.getElementById('btn-lessons');
+const exercisePanel = document.getElementById('exercise-panel');
+const exerciseSelect = document.getElementById('exercise-select');
+const sequenceDisplay = document.getElementById('sequence-display');
+const btnDemo = document.getElementById('btn-demo');
+const btnPractice = document.getElementById('btn-practice');
+const feedbackMessage = document.getElementById('feedback-message');
+const handpanSvg = document.getElementById('handpan-svg');
 
-// Initialize App
-function init() {
-  setupNavigation();
-  setupHandpanInteraction();
-  setupSoundActivation();
-  setupMetronome();
-  renderLessons();
-  updateProgressUI();
-  cloneHandpanToPractice();
-}
-
-// Navigation
-function setupNavigation() {
-  navItems.forEach(item => {
-    item.addEventListener('click', () => {
-      const targetView = item.getAttribute('data-view');
-      switchView(targetView);
-    });
-  });
-}
-
-function switchView(viewId) {
-  views.forEach(view => view.classList.remove('active'));
-  navItems.forEach(item => item.classList.remove('active'));
-
-  const activeView = document.getElementById(`view-${viewId}`);
-  const activeNavItem = document.querySelector(`.nav-item[data-view="${viewId}"]`);
-
-  if (activeView) activeView.classList.add('active');
-  if (activeNavItem) activeNavItem.classList.add('active');
-
-  state.currentView = viewId;
-
-  // Stop practice if leaving practice view
-  if (viewId !== 'practice' && state.practiceActive) {
-    stopPractice();
+// Initialize Audio Context on first user interaction
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
   }
 }
 
-// Sound Activation
-function setupSoundActivation() {
-  btnSoundInit.addEventListener('click', () => {
-    synth.init();
-    state.soundEnabled = !state.soundEnabled;
-    if (state.soundEnabled) {
-      soundIcon.className = 'fas fa-volume-up';
-      btnSoundInit.style.color = 'var(--primary)';
-    } else {
-      soundIcon.className = 'fas fa-volume-mute';
-      btnSoundInit.style.color = 'var(--text-light)';
-    }
+// Synthesize Handpan Sound
+function playHandpanSound(noteId) {
+  initAudio();
+  if (!audioCtx) return;
+
+  const note = NOTES[noteId];
+  if (!note) return;
+
+  const now = audioCtx.currentTime;
+  const freq = note.freq;
+
+  // Create nodes
+  const masterGain = audioCtx.createGain();
+  masterGain.gain.setValueAtTime(0.6, now);
+  masterGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+
+  // 1. Fundamental Frequency
+  const osc1 = audioCtx.createOscillator();
+  const gain1 = audioCtx.createGain();
+  osc1.type = 'sine';
+  osc1.frequency.setValueAtTime(freq, now);
+  gain1.gain.setValueAtTime(0.7, now);
+  gain1.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
+
+  // 2. Harmonic 1 (Octave - typical of handpan tuning)
+  const osc2 = audioCtx.createOscillator();
+  const gain2 = audioCtx.createGain();
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(freq * 2, now);
+  gain2.gain.setValueAtTime(0.3, now);
+  gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+  // 3. Harmonic 2 (Compound Fifth / Octave + Fifth)
+  const osc3 = audioCtx.createOscillator();
+  const gain3 = audioCtx.createGain();
+  osc3.type = 'sine';
+  osc3.frequency.setValueAtTime(freq * 3, now);
+  gain3.gain.setValueAtTime(0.15, now);
+  gain3.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+
+  // Connections
+  osc1.connect(gain1).connect(masterGain);
+  osc2.connect(gain2).connect(masterGain);
+  osc3.connect(gain3).connect(masterGain);
+  
+  masterGain.connect(audioCtx.destination);
+
+  // Start and Stop
+  osc1.start(now);
+  osc2.start(now);
+  osc3.start(now);
+
+  osc1.stop(now + 2.6);
+  osc2.stop(now + 1.6);
+  osc3.stop(now + 1.1);
+}
+
+// Inject SVG Gradients dynamically for beautiful metallic look
+function injectGradients() {
+  const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+  defs.innerHTML = `
+    <radialGradient id="metallic-grad" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+      <stop offset="0%" stop-color="#475569" />
+      <stop offset="50%" stop-color="#334155" />
+      <stop offset="85%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </radialGradient>
+  `;
+  handpanSvg.insertBefore(defs, handpanSvg.firstChild);
+}
+
+// Trigger visual feedback on Handpan Note
+function triggerVisualNote(noteId, type = 'active') {
+  const noteEl = document.getElementById(`note-${noteId}`);
+  if (noteEl) {
+    noteEl.classList.add(type);
+    setTimeout(() => {
+      noteEl.classList.remove(type);
+    }, 400);
+  }
+}
+
+// Handle Note Input (Click/Touch)
+function handleNoteInput(noteId) {
+  playHandpanSound(noteId);
+  triggerVisualNote(noteId, 'active');
+
+  if (currentMode === 'lessons' && isPracticeMode && !isPlayingDemo) {
+    checkPracticeInput(noteId);
+  }
+}
+
+// Populate Exercises Dropdown
+function populateExercises() {
+  exerciseSelect.innerHTML = '';
+  EXERCISES.forEach((ex, index) => {
+    const option = document.createElement('option');
+    option.value = index;
+    option.textContent = ex.name;
+    exerciseSelect.appendChild(option);
   });
 }
 
-// Handpan Interaction
-function setupHandpanInteraction() {
-  const notes = document.querySelectorAll('.handpan-ding, .handpan-note');
-  notes.forEach(note => {
-    const triggerPlay = (e) => {
-      e.preventDefault();
-      const noteName = note.getAttribute('data-note');
-      synth.playNote(noteName);
+// Render Fixed Sequence Display (Requested Feature)
+function renderSequence() {
+  const exercise = EXERCISES[currentExerciseIndex];
+  sequenceDisplay.innerHTML = '';
+  
+  exercise.sequence.forEach((note, index) => {
+    const noteBadge = document.createElement('div');
+    noteBadge.classList.add('seq-note');
+    noteBadge.id = `seq-step-${index}`;
+    noteBadge.textContent = note.replace('Bb', 'B♭');
+    sequenceDisplay.appendChild(noteBadge);
+  });
+}
+
+// Play Demo (Requested Feature: plays sequence and highlights notes)
+function playDemo() {
+  if (isPlayingDemo) return;
+  stopAllDemoTimeouts();
+  
+  isPlayingDemo = true;
+  isPracticeMode = false;
+  btnDemo.disabled = true;
+  btnPractice.disabled = true;
+  
+  feedbackMessage.textContent = "Écoutez et observez la séquence...";
+  feedbackMessage.style.color = "#f59e0b";
+
+  // Reset sequence badges styling
+  const badges = document.querySelectorAll('.seq-note');
+  badges.forEach(b => b.className = 'seq-note');
+
+  const exercise = EXERCISES[currentExerciseIndex];
+  
+  exercise.sequence.forEach((noteId, index) => {
+    const timeoutId = setTimeout(() => {
+      // Highlight sequence badge
+      const badge = document.getElementById(`seq-step-${index}`);
+      if (badge) {
+        badge.classList.add('demo-highlight');
+      }
+
+      // Highlight handpan note visually and play sound
+      playHandpanSound(noteId);
+      triggerVisualNote(noteId, 'demo-highlight');
+
+      // Remove badge highlight after delay
+      setTimeout(() => {
+        if (badge) badge.classList.remove('demo-highlight');
+      }, 500);
+
+      // End of demo check
+      if (index === exercise.sequence.length - 1) {
+        setTimeout(() => {
+          isPlayingDemo = false;
+          btnDemo.disabled = false;
+          btnPractice.disabled = false;
+          feedbackMessage.textContent = "À vous de jouer ! Cliquez sur 'S'entraîner'.";
+          feedbackMessage.style.color = "#38bdf8";
+        }, 800);
+      }
+    }, index * 800);
+    
+    demoTimeoutIds.push(timeoutId);
+  });
+}
+
+// Stop any running demo timeouts
+function stopAllDemoTimeouts() {
+  demoTimeoutIds.forEach(id => clearTimeout(id));
+  demoTimeoutIds = [];
+  isPlayingDemo = false;
+  btnDemo.disabled = false;
+  btnPractice.disabled = false;
+  
+  // Clean up highlights
+  document.querySelectorAll('.seq-note').forEach(b => b.className = 'seq-note');
+  document.querySelectorAll('.handpan-note').forEach(n => n.classList.remove('demo-highlight', 'practice-target'));
+}
+
+// Start Practice Mode
+function startPractice() {
+  stopAllDemoTimeouts();
+  isPracticeMode = true;
+  practiceStep = 0;
+  
+  feedbackMessage.textContent = "C'est parti ! Jouez la première note.";
+  feedbackMessage.style.color = "#38bdf8";
+
+  updatePracticeUI();
+}
+
+// Update Practice UI elements
+function updatePracticeUI() {
+  const exercise = EXERCISES[currentExerciseIndex];
+  const badges = document.querySelectorAll('.seq-note');
+  
+  badges.forEach((badge, index) => {
+    badge.className = 'seq-note';
+    if (index < practiceStep) {
+      badge.classList.add('completed');
+    } else if (index === practiceStep) {
+      badge.classList.add('active');
+    }
+  });
+
+  // Highlight target note on handpan subtly
+  document.querySelectorAll('.handpan-note').forEach(n => n.classList.remove('practice-target'));
+  if (practiceStep < exercise.sequence.length) {
+    const targetNoteId = exercise.sequence[practiceStep];
+    const targetEl = document.getElementById(`note-${targetNoteId}`);
+    if (targetEl) {
+      targetEl.classList.add('practice-target');
+    }
+  }
+}
+
+// Check Practice Input
+function checkPracticeInput(noteId) {
+  const exercise = EXERCISES[currentExerciseIndex];
+  const expectedNote = exercise.sequence[practiceStep];
+
+  if (noteId === expectedNote) {
+    practiceStep++;
+    if (practiceStep >= exercise.sequence.length) {
+      // Exercise Completed!
+      isPracticeMode = false;
+      document.querySelectorAll('.handpan-note').forEach(n => n.classList.remove('practice-target'));
       
-      // Visual feedback
-      note.classList.add('active');
-      setTimeout(() => note.classList.remove('active'), 150);
-
-      // Practice Mode Hit Detection
-      if (state.practiceActive) {
-        handlePracticeHit(noteName);
-      }
-    };
-
-    note.addEventListener('mousedown', triggerPlay);
-    note.addEventListener('touchstart', triggerPlay, { passive: false });
-  });
-}
-
-// Clone Handpan SVG to Practice View
-function cloneHandpanToPractice() {
-  const originalSvg = document.querySelector('.handpan-svg');
-  practiceHandpanSvg.innerHTML = originalSvg.innerHTML;
-  // Re-bind events for the cloned SVG
-  const notes = practiceHandpanSvg.querySelectorAll('.handpan-ding, .handpan-note');
-  notes.forEach(note => {
-    const triggerPlay = (e) => {
-      e.preventDefault();
-      const noteName = note.getAttribute('data-note');
-      synth.playNote(noteName);
-      note.classList.add('active');
-      setTimeout(() => note.classList.remove('active'), 150);
-      if (state.practiceActive) {
-        handlePracticeHit(noteName);
-      }
-    };
-    note.addEventListener('mousedown', triggerPlay);
-    note.addEventListener('touchstart', triggerPlay, { passive: false });
-  });
-}
-
-// Metronome Logic
-function setupMetronome() {
-  bpmRange.addEventListener('input', (e) => {
-    state.bpm = e.target.value;
-    bpmDisplay.textContent = `${state.bpm} BPM`;
-    if (state.isMetronomePlaying) {
-      stopMetronome();
-      startMetronome();
-    }
-  });
-
-  btnMetronomeToggle.addEventListener('click', () => {
-    if (state.isMetronomePlaying) {
-      stopMetronome();
+      // Mark all completed
+      document.querySelectorAll('.seq-note').forEach(b => b.className = 'seq-note completed');
+      
+      feedbackMessage.textContent = "Félicitations ! Exercice réussi ! 🎉";
+      feedbackMessage.style.color = "#10b981";
+      
+      // Play a small success chord
+      setTimeout(() => {
+        playHandpanSound('D3');
+        playHandpanSound('D4');
+        playHandpanSound('A4');
+      }, 300);
     } else {
-      startMetronome();
+      feedbackMessage.textContent = "Bien joué ! Continuez...";
+      feedbackMessage.style.color = "#10b981";
+      updatePracticeUI();
     }
-  });
-}
-
-function startMetronome() {
-  synth.init();
-  state.isMetronomePlaying = true;
-  btnMetronomeToggle.innerHTML = '<i class="fas fa-stop"></i> Arrêter';
-  btnMetronomeToggle.style.background = 'var(--accent)';
-
-  const intervalMs = (60 / state.bpm) * 1000;
-  state.metronomeInterval = setInterval(() => {
-    // Play a high-pitched click for metronome beat
-    if (synth.ctx) {
-      const osc = synth.ctx.createOscillator();
-      const gain = synth.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(800, synth.ctx.currentTime);
-      gain.gain.setValueAtTime(0.1, synth.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, synth.ctx.currentTime + 0.05);
-      osc.connect(gain);
-      gain.connect(synth.ctx.destination);
-      osc.start();
-      osc.stop(synth.ctx.currentTime + 0.06);
-    }
-  }, intervalMs);
-}
-
-function stopMetronome() {
-  state.isMetronomePlaying = false;
-  btnMetronomeToggle.innerHTML = '<i class="fas fa-play"></i> Métronome';
-  btnMetronomeToggle.style.background = 'var(--primary)';
-  clearInterval(state.metronomeInterval);
-}
-
-// Render Lessons
-function renderLessons() {
-  lessonsContainer.innerHTML = '';
-  lessons.forEach(lesson => {
-    const isCompleted = state.completedLessons.includes(lesson.id);
-    const card = document.createElement('div');
-    card.className = 'lesson-card';
-    card.innerHTML = `
-      <div class="lesson-info">
-        <div class="lesson-title">${lesson.title}</div>
-        <div class="lesson-desc">${lesson.desc}</div>
-        <div class="lesson-meta">
-          <span class="badge ${lesson.difficultyClass}">${lesson.difficulty}</span>
-          <span class="badge">${lesson.notes.length} notes</span>
-          ${isCompleted ? '<span class="badge" style="background: var(--success); color: white;">Complété</span>' : ''}
-        </div>
-      </div>
-      <div class="lesson-action">
-        <button class="btn-primary btn-start-lesson" data-id="${lesson.id}">S'entraîner</button>
-      </div>
-    `;
-    lessonsContainer.appendChild(card);
-  });
-
-  // Bind lesson buttons
-  document.querySelectorAll('.btn-start-lesson').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const lessonId = btn.getAttribute('data-id');
-      startLessonPractice(lessonId);
-    });
-  });
-}
-
-// Practice Mode Logic
-function startLessonPractice(lessonId) {
-  const lesson = lessons.find(l => l.id === lessonId);
-  if (!lesson) return;
-
-  state.currentPracticeLesson = lesson;
-  switchView('practice');
-
-  document.getElementById('practice-title').textContent = lesson.title;
-  document.getElementById('practice-desc').textContent = lesson.desc;
-  feedbackText.textContent = "Prêt ? Appuyez sur Commencer !";
-  scrollingNotesContainer.innerHTML = '';
-}
-
-btnStartPractice.addEventListener('click', () => {
-  if (state.practiceActive) {
-    stopPractice();
   } else {
-    startPractice();
+    // Wrong note - reset step to encourage learning
+    practiceStep = 0;
+    feedbackMessage.textContent = "Oups ! Recommençons du début.";
+    feedbackMessage.style.color = "#ef4444";
+    updatePracticeUI();
+  }
+}
+
+// Event Listeners
+function setupEventListeners() {
+  // Mode Switcher
+  btnFreePlay.addEventListener('click', () => {
+    currentMode = 'free-play';
+    btnFreePlay.classList.add('active');
+    btnLessons.classList.remove('active');
+    exercisePanel.classList.add('hidden');
+    stopAllDemoTimeouts();
+    isPracticeMode = false;
+    document.querySelectorAll('.handpan-note').forEach(n => n.classList.remove('practice-target'));
+  });
+
+  btnLessons.addEventListener('click', () => {
+    currentMode = 'lessons';
+    btnLessons.classList.add('active');
+    btnFreePlay.classList.remove('active');
+    exercisePanel.classList.remove('hidden');
+    selectExercise(exerciseSelect.value);
+  });
+
+  // Exercise Selector
+  exerciseSelect.addEventListener('change', (e) => {
+    selectExercise(e.target.value);
+  });
+
+  // Demo & Practice Buttons
+  btnDemo.addEventListener('click', playDemo);
+  btnPractice.addEventListener('click', startPractice);
+
+  // Handpan Note Interactions (Mouse & Touch)
+  const notes = document.querySelectorAll('.handpan-note');
+  notes.forEach(noteEl => {
+    const noteId = noteEl.getAttribute('data-note');
+    
+    noteEl.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      handleNoteInput(noteId);
+    });
+
+    noteEl.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Prevent double trigger with click
+      handleNoteInput(noteId);
+    }, { passive: false });
+  });
+}
+
+// Select and Load Exercise
+function selectExercise(index) {
+  currentExerciseIndex = parseInt(index, 10);
+  stopAllDemoTimeouts();
+  isPracticeMode = false;
+  renderSequence();
+  feedbackMessage.textContent = EXERCISES[currentExerciseIndex].description;
+  feedbackMessage.style.color = "#94a3b8";
+}
+
+// App Initialization
+window.addEventListener('DOMContentLoaded', () => {
+  injectGradients();
+  populateExercises();
+  setupEventListeners();
+  
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('Service Worker Registered'))
+      .catch(err => console.error('Service Worker Registry Failed', err));
   }
 });
-
-function startPractice() {
-  if (!state.currentPracticeLesson) {
-    state.currentPracticeLesson = lessons[0]; // Fallback to first lesson
-  }
-
-  synth.init();
-  state.practiceActive = true;
-  state.practiceScore = 0;
-  state.practiceTotal = 0;
-  btnStartPractice.textContent = "Arrêter";
-  btnStartPractice.style.background = 'var(--accent)';
-  feedbackText.textContent = "Écoutez le rythme...";
-
-  // Generate scrolling notes based on lesson
-  const lesson = state.currentPracticeLesson;
-  state.practiceNotes = [];
-  scrollingNotesContainer.innerHTML = '';
-
-  let delay = 1000; // Initial delay
-  const interval = (60 / state.bpm) * 1000;
-
-  lesson.notes.forEach((note, index) => {
-    const hand = lesson.hands[index];
-    const targetTime = Date.now() + delay + (index * interval);
-    
-    state.practiceNotes.push({
-      note,
-      hand,
-      targetTime,
-      hit: false
-    });
-
-    // Create visual note element
-    const noteEl = document.createElement('div');
-    noteEl.className = `target-note hand-${hand}`;
-    noteEl.style.borderColor = hand === 'G' ? 'var(--left-hand)' : 'var(--right-hand)';
-    noteEl.style.background = 'rgba(0,0,0,0.8)';
-    noteEl.style.color = '#fff';
-    noteEl.innerHTML = `<div>${note}</div><div style="font-size:8px;">${hand}</div>`;
-    noteEl.style.left = '100%';
-    scrollingNotesContainer.appendChild(noteEl);
-
-    // Animate note
-    const animationDuration = interval * 2;
-    noteEl.animate([
-      { left: '100%' },
-      { left: '0%' }
-    ], {
-      duration: animationDuration,
-      easing: 'linear',
-      delay: delay + (index * interval) - animationDuration,
-      fill: 'forwards'
-    });
-
-    // Remove element after animation
-    setTimeout(() => {
-      noteEl.remove();
-    }, delay + (index * interval) + 500);
-  });
-
-  state.practiceTotal = lesson.notes.length;
-
-  // End of practice session check
-  setTimeout(() => {
-    finishPractice();
-  }, delay + (lesson.notes.length * interval) + 1000);
-}
-
-function handlePracticeHit(noteName) {
-  const now = Date.now();
-  // Find closest unhit note
-  const target = state.practiceNotes.find(n => !n.hit && Math.abs(n.targetTime - now) < 400);
-
-  if (target) {
-    target.hit = true;
-    const diff = Math.abs(target.targetTime - now);
-    if (target.note === noteName) {
-      if (diff < 100) {
-        feedbackText.textContent = "PARFAIT !";
-        feedbackText.style.color = 'var(--success)';
-        state.practiceScore += 100;
-      } else if (diff < 250) {
-        feedbackText.textContent = "BIEN !";
-        feedbackText.style.color = 'var(--primary)';
-        state.practiceScore += 70;
-      } else {
-        feedbackText.textContent = "TROP TARD / TÔT";
-        feedbackText.style.color = 'var(--accent)';
-        state.practiceScore += 40;
-      }
-    } else {
-      feedbackText.textContent = "MAUVAISE NOTE !";
-      feedbackText.style.color = '#ff4d6d';
-    }
-  }
-}
-
-function stopPractice() {
-  state.practiceActive = false;
-  btnStartPractice.textContent = "Commencer l'exercice";
-  btnStartPractice.style.background = 'var(--primary)';
-  feedbackText.textContent = "Prêt ?";
-  scrollingNotesContainer.innerHTML = '';
-}
-
-function finishPractice() {
-  if (!state.practiceActive) return;
-  state.practiceActive = false;
-  btnStartPractice.textContent = "Recommencer";
-  btnStartPractice.style.background = 'var(--primary)';
-
-  const maxPossibleScore = state.practiceTotal * 100;
-  const accuracy = maxPossibleScore > 0 ? Math.round((state.practiceScore / maxPossibleScore) * 100) : 0;
-
-  feedbackText.textContent = `Session terminée ! Précision : ${accuracy}%`;
-  feedbackText.style.color = 'var(--primary)';
-
-  // Save progress
-  if (accuracy >= 70 && state.currentPracticeLesson) {
-    if (!state.completedLessons.includes(state.currentPracticeLesson.id)) {
-      state.completedLessons.push(state.currentPracticeLesson.id);
-      localStorage.setItem('panzen_completed_lessons', JSON.stringify(state.completedLessons));
-      renderLessons();
-    }
-  }
-
-  // Save history
-  const session = {
-    date: new Date().toLocaleDateString('fr-FR'),
-    lessonTitle: state.currentPracticeLesson ? state.currentPracticeLesson.title : "Pratique Libre",
-    accuracy: accuracy
-  };
-  state.history.unshift(session);
-  if (state.history.length > 10) state.history.pop();
-  localStorage.setItem('panzen_history', JSON.stringify(state.history));
-
-  updateProgressUI();
-}
-
-// Update Progress View
-function updateProgressUI() {
-  document.getElementById('stat-completed').textContent = `${state.completedLessons.length}/${lessons.length}`;
-  
-  const avgAccuracy = state.history.length > 0 
-    ? Math.round(state.history.reduce((acc, curr) => acc + curr.accuracy, 0) / state.history.length) 
-    : 0;
-  document.getElementById('stat-accuracy').textContent = `${avgAccuracy}%`;
-
-  const historyContainer = document.getElementById('history-container');
-  if (state.history.length === 0) {
-    historyContainer.innerHTML = '<div class="text-center text-muted" style="padding: 20px;">Aucune session enregistrée pour le moment.</div>';
-  } else {
-    historyContainer.innerHTML = state.history.map(item => `
-      <div class="history-item">
-        <div>
-          <strong>${item.lessonTitle}</strong>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${item.date}</div>
-        </div>
-        <div style="font-weight: bold; color: ${item.accuracy >= 70 ? 'var(--success)' : 'var(--primary)'}">${item.accuracy}%</div>
-      </div>
-    `).join('');
-  }
-}
-
-// Service Worker Registration
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
-  });
-}
-
-// Run App
-init();
