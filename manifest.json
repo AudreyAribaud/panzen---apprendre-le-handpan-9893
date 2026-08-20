@@ -1,12 +1,12 @@
 {
-  "name": "PanZen - Apprendre le Handpan",
-  "short_name": "PanZen",
-  "description": "Une application zen et interactive pour apprendre le handpan sur smartphone.",
-  "start_url": "index.html",
+  "name": "Panzen - Apprendre le Handpan",
+  "short_name": "Panzen",
+  "description": "Application moderne et immersive pour apprendre et jouer du handpan.",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#090d16",
-  "theme_color": "#0f172a",
-  "orientation": "portrait",
+  "background_color": "#0d1117",
+  "theme_color": "#ffb703",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=192&q=80",
